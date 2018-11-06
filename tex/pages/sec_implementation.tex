@@ -1,0 +1,42 @@
+\subsection{Software implementation}
+\label{sec:action_methods_softwareimplementation}
+
+The system is controlled via a graphical interface, which is shown in \figref{fig:sec_usingaffordanceforplanning_gui}.
+The interface is programmed in \gls{ac:ros}, too, and operates as a central instance to control the computer vision system and the robot interface.
+In the following, a short overview is given.
+The numbers correlate to markings in \figref{fig:sec_usingaffordanceforplanning_gui}:
+
+\begin{enumerate}
+  \item Action list: This list holds atomic actions implemented on the robot.
+  \item Object 1 list: Here, all recognized objects are listed and the main object is chosen.
+  \item Object 2 list: Here, all recognized objects are listed and the primary object is chosen.
+  \item Kinect Preview: This button opens a new window, showing the output from the Kinect/Asus Xtion Pro 3d sensor. It is used to calibrate the robot cell.
+  \item DSLR: Preview: This button opens a new window, showing the output from the DSLR camera. It is used for calibration, too.
+  \item Calibrate now: The Kinect (as well as Asus Xtion Pro) sensor has known issues concerning depth accuracy. Accuracy can be significantly improved when calibrating the internal parameters of both infrared camera and RGB camera, as well as their relative pose~\cite{darwish2017new}. This button launches the checkerboard calibration method as described in~\cite{darwish2017new} and aligns the camera relative to the robot base.
+  \item Load Kuka Calibration: Instead of starting a new checkerboard calibration, parameters are loaded from file.
+  \item Search Objects: Object candidates are searched, clustered, and classified. All recognized objects are listed in both lists for main and primary object.
+  \item Plan Test: Debug function for the planner, which loads predefined sensor data from file and requests the \gls{ac:sec} planner to compute a plan. This allows to test different planner settings.
+  \item Plan: Requests the \gls{ac:sec} planner to compute a plan using current sensor data.
+  \item Call Kuka Plan: This button executes the computed plan on the KUKA robot.
+  \item Run Single Action: Debug function, which tries to execute the selected action from list (1) with the selected objects from list (2) and (3) without any planning on the robot.
+  \item Call Geometric Reasoning: Debug function, which requests geometric reasoning as described in \secref{ssec:sec_affordanceofsemanticeventchains}, using the current scene and the two selected objects and outputs the result to screen.
+  \item Run Multiple Actions: A pre-computed plan is read from file and executed on the robot.
+  \item Grasp Planner: Request a low level trajectory planning for grasping an object, \eg from where and how the object should be grasped given the available geometric information.
+  \item Decision Making: Implementation of high level symbolic planner as described in~\cite{agostinitorraswoergoetter2017}. The decision making process starts another GUI, which hands its results back to this interface.
+  \item Action/FRI Status: FRI stands for ``Fast Research Interface''~\cite{schreiber2010fast}, a technology developed by KUKA for network access of the used KUKA light\-weight robot arm. Here a status line is presented to the user showing possible network errors.
+  \item Start FRI: A network connection to the robot is established using the above mentioned network interface.
+  \item Stop FRI: The previously mentioned network connection is terminated.
+  \item Move PTP: Stops any current robot motion and moves the robot to a pre-defined position, also called home-position.
+\end{enumerate}
+
+\begin{figure}
+  \centering
+  \input{./figures/sec/planning/gui.tex}
+  \caption{Screenshot of the front end GUI of the planning system, which is presented to the user. Numbers have been inserted to describe their functions and are listed in \secref{sec:sec_usingaffordanceforplanning_planningsystem}.}
+  \label{fig:sec_usingaffordanceforplanning_gui}
+\end{figure}
+
+
+
+
+

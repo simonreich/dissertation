@@ -1,0 +1,21 @@
+% Define block styles
+\tikzstyle{block} = [draw, rectangle, text centered, text width=10em, minimum height=0.5em, rounded corners=true]
+\tikzstyle{arrowtext} = [text width=4em, text centered]
+\tikzstyle{arrow} = [draw, -latex]
+
+\definecolor{red1}{RGB}{160,0,0}
+\definecolor{green1}{RGB}{0,160,0}
+\definecolor{blue1}{RGB}{0,0,160}
+
+\usetikzlibrary{shapes.geometric,arrows,positioning}
+
+	      
+\begin{tikzpicture}[node distance=4em, auto]
+    % Draw axis
+    \draw [-, dashed] (-1.5,0) |- (1.5,0);
+    \draw [-, dashed] (0,-1.5) |- (0,1.5);
+
+    % point
+    \draw[fill=red1, color=red1] (0.8,0.8) circle (2pt) node [below, color=black, xshift=0.2em] {$\vec{s}$};
+    \draw[fill=red1, color=red1] (0,0) circle (2pt) node [below, color=black, xshift=-0.5em] {$\vec{c}$};
+\end{tikzpicture}

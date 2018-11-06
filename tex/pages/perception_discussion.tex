@@ -1,0 +1,84 @@
+\section{Discussion}
+\label{sec:perception_discussion}
+
+
+
+
+
+\subsection{Edge-Preserving Filter}
+
+Here, a novel real-time edge preserving denoising filter named EPF is presented, which replaces noisy areas by uniformly colored patches. 
+Performance is significantly better than other standard methods on 2d images. 
+Artificial 1d data shows similar results.
+
+In~\cite{gu2014weighted} a comparison to other methods is given, including state-of-the-art methods like BM3D~\cite{dabov2007image}, EPLL~\cite{zoran2011learning}, or LSSC~\cite{mairal2009non} based on the Berkeley Data Set~\cite{arbelaez2011contour}. 
+All these methods exploit the image nonlocal redundancies, in contrast to \gls{ac:epf}, which uses a local neighborhood. 
+In \tabref{tab:sensor_discussion_psnr} a comparison between the proposed \gls{ac:epf} algorithm and other state-of-the-art methods is shown.
+Clearly, the proposed method performs slightly worse than other recent algorithms.
+On the contrary the review~\cite{shao2014heuristic} performs a conclusive study on computational complexity. 
+According to this work, one of the fastest algorithms, BM3D, manages to denoise not more than one image sized $\unit[256 \times 256]{px}$ per second. 
+This is far from real-time and not feasible for robotic applications or critical sensor readings. 
+A comparison to the proposed \gls{ac:epf} filter is shown in \tabref{tab:sensor_experiments_resfps}.
+
+\begin{table}[]
+  \centering
+  \begin{tabular}{ccc}
+    \toprule
+    Gaussian Noise  & Recent Methods & EPF\\
+    \midrule
+    $\sigma = 10$   & $33.5 - 34.8$ & $30.7$\\
+    $\sigma = 30$   & $27.8 - 29.2$ & $23.0$\\
+    $\sigma = 50$   & $25.1 - 26.8$ & $19.9$\\
+    $\sigma = 100$  & $21.6 - 23.6$ & $15.5$\\
+    \bottomrule
+  \end{tabular}
+  \caption{PSNR values computed on the Berkeley data set for state-of-the-art methods (as shown in~\cite{gu2014weighted}) compared to the proposed \gls{ac:epf} filter.}
+  \label{tab:sensor_discussion_psnr}
+\end{table}
+
+This means, the proposed \gls{ac:epf} performs only slightly worse than recent denoising methods, but offers real-time performance, which makes the filter applicable to video streams and hence can be used in the future as a component inside the perception-action loop of robotic applications.
+It enables image processing and data filtering on embedded hardware, for example in flying robots, which is another research area of ours.
+The filter not only works well in the image domain, but can be extended to data of any dimension, \eg noisy 6d point cloud data.
+This is demonstrated in this work by filtering 1d sensor data.
+
+
+
+
+
+\subsection{Embedded Visual Odometry}
+
+A novel lightweight omnidirectional camera setup for fast moving robots is investigated.
+All computations are performed online on the robot.
+\gls{ac:vo} is evaluated using two simulated environments.
+Then, \gls{ac:vo} is combined with \gls{ac:imu} data.
+The resulting pose information is confirmed on a real robot using external tracking and via measuring the final displacement during an office flight.
+
+The achieved frame rate of $\unit[15 \pm 3]{Hz}$, as shown in~\tabref{tab:robot_experiments_framerate}, is sufficient for real-time applications in autonomous agents with low-power hardware.
+A real world example gives an understanding of the error margins: A self localization error of $\unit[0.1]{m}$ and a frame rate of $\unit[15]{Hz}$ is assumed.
+Furthermore, we will assume that the \gls{ac:aav} needs 5 frames to detect an obstacle and initiate counter measures.
+Using the given frame rate of $\unit[15]{Hz}$, the quadrocopter needs approximately $\unit[0.33]{s}$ to detect an obstacle.
+Within these $\unit[0.33]{s}$ the safety error margin of $\unit[0.1]{m}$ (the above localization error) must not be met.
+Thus, we can survey in indoor environments with a maximum velocity of approximately $\unit[1.1]{km/h}$.
+This allows for a broad range of applications, \eg fast search and rescue in impassable terrain.
+
+First, the \gls{ac:evo} algorithm is tested in simulation on two benchmarks.
+It is shown that it performs significantly better than current state-of-the-art methods.
+
+Next, the robot is tracked via an external camera system.
+The deviation between external tracking and the robot's internal state of believe was found to be $\unit[5 \pm 3]{cm}$ in manual mode on average; in real flight self localization performs at $\unit[9 \pm 4]{cm}$.
+The utilized external tracking system performs already with an error of at least $\unit[\pm 1]{cm}$~\cite{haggag2013measuring} and thus introduces significant uncertainty.
+
+As in \gls{ac:vo} algorithms the error accumulates over time and is hard to measure on short trajectories; therefore, a real world office flight with a trajectory of $\unit[19.4 \pm 0.1]{m}$ length is flown.
+While the robot started and landed on the same spot, the robot's internal believe state shows a displacement of about $\unit[0.10 \pm 0.01]{m}$.
+This leads to an error of $0.5\pm 0.1\%$, which is about the same as in the ``Indoor'' simulation environment.
+Here, the robot had a displacement of $\unit[0.14\pm 0.01]{m}$ on a $\unit[28]{m}$ trajectory.
+For comparison: the \unit[400]{m} ``Urban Canyon'' data set contains an error of approximately $6.8\%$.
+
+This work enables autonomous robots to localize themselves, while allowing at the same time to build a depth map.
+This map offers for example obstacle avoidance or mapping capabilities.
+All computations are performed online on embedded hardware, meaning that the robot is able to work in unknown environments.
+It can support autonomously, for example, in search and rescue mission, disaster relief work, or exploration tasks.
+
+This concludes the first part of this thesis.
+In the second part, the focus lies on the action side of the action-perception loop.
+It is shown that using a low level, bottom-up method, sophisticated high level planning is feasible.

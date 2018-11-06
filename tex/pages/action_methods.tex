@@ -1,0 +1,25 @@
+\section{Methods}
+\label{sec:action_methods}
+
+\begin{figure}[]
+  \centering
+  \input{./figures/sec/methods_flowchart.tex}
+  \caption{Flowchart of the methods in this chapter and how they relate. Details are explained in \secref{sec:action_methods}.}
+  \label{fig:actions_methods_flowchart}
+\end{figure}
+
+In this section, approaches to planning are introduced.
+An overview is given in \figref{fig:actions_methods_flowchart}: First, a) the scene is recorded as RGB-D image by an Asus Xtion Pro camera and a Nikon high resolution \gls{ac:dslr}.
+Each depth frame is b) preprocessed by computer vision algorithms.
+They are segmented via the Locally Convex Connected Patches (LCCP) algorithm~\cite{stein2014object} into clusters, where each cluster correlates to one object candidate.
+For object recognition~\cite{schoeler2014fast} is used; objects are tracked via~\cite{paponkulviciusaksoy2013}. 
+All parts of the algorithms are integrated as modular \gls{ac:ros} nodes~\cite{quigleyconleygerkey2009}.
+Next, the objects are categorized based on c) an action ontology, \secref{ssec:action_methods_actioncategories}.
+This categorization is used throughout the rest of this thesis.
+Based on this information, a graph structure is retrieved in d) \acrlong{ac:sec} (\secref{ssec:action_methods_semanticeventchains}).
+As first contribution, the graph is enriched with pose information by e) a novel 3d reasoning algorithm (\secref{ssec:action_methods_enrichedsemanticeventchains}).
+Afterwards, it is shown in f) that each graph can be reduced to only three different subgraphs (\secref{ssec:action_methods_structuralinformation}).
+This in turn is used to compute g) a scene's affordance (\secref{ssec:action_methods_affordanceofsemanticeventchains}).
+Here, for example the question is asked: ``Given a tomato, a knife, and a cutting board, what can one do with these objects?''
+In h), it is shown how the approach can be extended for complex action planning (\secref{ssec:action_methods_usingaffordanceforplanning}).
+As an example it is analyzed what actions a robot needs to perform when given the command ``Make me a sandwich.''

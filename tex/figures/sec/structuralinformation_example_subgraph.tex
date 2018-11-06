@@ -1,0 +1,65 @@
+% Define block styles
+\tikzstyle{block} = [rectangle, fill=white, text centered, minimum height=0.5em, rounded corners=false]
+\tikzstyle{arrow} = [draw, -latex]
+
+\usetikzlibrary{decorations.pathreplacing}
+
+\definecolor{red1}{RGB}{160,0,0}
+\definecolor{green1}{RGB}{0,160,0}
+\definecolor{blue1}{RGB}{0,0,160}
+
+	      
+\begin{tikzpicture}[node distance=3em, auto]
+	% full
+	\node [block, below of=S01, node distance=10em] (S1) {Support};
+	\node [block, above of=S1] (M1) {\textcolor{red1}{Main}};
+	\node [block, left of=M1, node distance=4em]  (O11) {O$_1$};
+	\node [block, right of=M1, node distance=4em] (O12) {O$_2$};
+	\node [block, above of=M1] (O13) {O$_3$};
+
+	\draw [] (S1.north) to (M1.south);
+	\draw [] (S1.north west) to (O11.south east);
+	\draw [] (S1.north east) to (O12.south west);
+	\draw [] (M1.north) to (O13.south);
+	\draw [] (M1.east) to (O12.west);
+
+	% arrow
+	\draw [arrow] (O12.east)++(1.5em,0em) to ++(3.5em,0em);
+
+	% {
+	\draw [decorate, decoration={brace, amplitude=10pt}, right of=O12, xshift=2.5em, node distance=3em] (7em,-11.0em) -- (7em,-3.0em) node (klammer1) [black,midway] {};
+
+	% 3
+	%\node [block, right of=S1, node distance=10em] (S3) {S};
+	%\node [block, above of=S3] (M3) {\textcolor{red1}{M}};
+	%\node [block, left of=M3]  (O31) {O};
+
+	%\draw [] (S3.north) to (M3.south);
+	%\draw [] (S3.north west) to (O31.south east);
+
+	% +
+	%\node [block, right of=M3, node distance=1.5em] (+) {+};
+
+	% 1
+	\node [block, right of=S1, node distance=15em] (S2) {Support};
+	\node [block, above of=S2] (M2) {\textcolor{red1}{Main}};
+	\node [block, above of=M2] (O23) {Primary};
+
+	\draw [] (S2.north) to (M2.south);
+	\draw [] (M2.north) to (O23.south);
+
+	% +
+	\node [block, right of=M2, node distance=3em, yshift=-0.35em] (+) {,};
+
+	% 2
+	\node [block, right of=S2, node distance=6em] (S3) {Support};
+	\node [block, above of=S3] (M3) {\textcolor{red1}{Main}};
+	\node [block, right of=M3, xshift=2em] (O32) {Primary};
+
+	\draw [] (S3.north) to (M3.south);
+	\draw [] (S3.north east) to (O32.south west);
+	\draw [] (M3.east) to (O32.west);
+
+	% {
+	\draw [decorate, decoration={brace, amplitude=10pt, mirror}, right of=O32] (25.7em,-11.0em) -- (25.7em,-3.0em) node [black,midway] {};
+\end{tikzpicture}

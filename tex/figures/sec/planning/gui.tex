@@ -1,0 +1,45 @@
+% Define block styles
+\tikzstyle{blockNumber} = [rectangle, draw, fill=white, text centered, minimum height=0.5em, rounded corners=true]
+\tikzstyle{arrow} = [draw, -latex]
+
+\pgfdeclareimage[width=13cm]{background}{./figures/sec/planning/gui.png}
+
+\usetikzlibrary{decorations.pathreplacing}
+
+\definecolor{red1}{RGB}{160,0,0}
+\definecolor{green1}{RGB}{0,160,0}
+\definecolor{blue1}{RGB}{0,0,160}
+
+	      
+\begin{tikzpicture}[node distance=3cm, auto]
+  % Images
+  \node [] at (0,0) (bg) {\pgfuseimage{background}};
+
+  % Numbers
+  \node [blockNumber] at (-3.00, 3.50) (n1) {1};
+  \node [blockNumber] at ( 1.45, 3.50) (n1) {2};
+  \node [blockNumber] at ( 5.90, 3.50) (n1) {3};
+
+  \node [blockNumber] at (-4.00,-1.30) (n1) {4};
+  \node [blockNumber] at (-1.55,-1.30) (n1) {5};
+  \node [blockNumber] at ( 0.85,-1.30) (n1) {6};
+  \node [blockNumber] at ( 3.45,-1.30) (n1) {7};
+  \node [blockNumber] at ( 5.85,-1.30) (n1) {8};
+
+  \node [blockNumber] at (-1.55,-3.30) (n1) {9};
+  \node [blockNumber] at ( 0.85,-3.30) (n1) {10};
+  \node [blockNumber] at ( 3.45,-3.30) (n1) {11};
+  \node [blockNumber] at ( 5.85,-3.30) (n1) {12};
+
+  \node [blockNumber] at (-1.55,-4.10) (n1) {13};
+  \node [blockNumber] at ( 5.85,-4.10) (n1) {14};
+
+  \node [blockNumber] at ( 0.85,-4.00) (n1) {15};
+  \node [blockNumber] at ( 3.45,-4.00) (n1) {16};
+
+  \node [blockNumber] at (-5.00,-3.80) (n1) {17};
+
+  \node [blockNumber] at (-1.55,-4.90) (n1) {18};
+  \node [blockNumber] at ( 0.85,-4.90) (n1) {19};
+  \node [blockNumber] at ( 3.45,-4.90) (n1) {20};
+\end{tikzpicture}

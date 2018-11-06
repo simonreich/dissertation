@@ -1,0 +1,424 @@
+\section{Methods}
+\label{sec:perception_methods}
+
+
+This section divides into three parts, which are shown in \figref{fig:perception_methods_flowchart}.
+The a) hardware setup, namely the robots and camera, is presented in~\secref{ssec:perception_methods_hardwaresetup}.
+The next section, \secref{ssec:perception_methods_noiseandoutlierdetection} shows b) how to detect noise and outliers and how to remove them.
+The filter is described in the discrete, as well as continuous domain.
+In c),~\secref{ssec:perception_methods_visualodometryalgorithm}, the algorithms to compute a pose update based only on Visual Odometry on embedded hardware are shown. 
+
+\begin{figure}[]
+  \centering
+  \input{./figures/sensor/methods_flowchart.tex}
+  \caption{Flowchart of the methods in this chapter and how they relate. Details are explained in \secref{sec:perception_methods}.}
+  \label{fig:perception_methods_flowchart}
+\end{figure}
+
+
+
+
+
+\subsection{Hardware setup}
+\label{ssec:perception_methods_hardwaresetup}
+
+The hardware setup is depicted in \figref{fig:robot_introduction_photo}: A quadrocopter and a wheeled robot, both controlled by a Raspberry Pi mini computer.
+As the focus lies on denoising and \gls{ac:vo} in this part of the thesis, mostly the quadrotor platform will be analyzed --- it is fast moving and therefore more demanding.
+In order to cope with high turn rates in indoor environments, a catadioptric omnidirectional system is used.
+It is composed of an upwards pointing monocular camera and a hyperbolic mirror above as shown in \figref{fig:robot_method_algorithms_mirror_hyperbolaphoto}.
+The camera operates with a resolution of $\unit[480 \times\ 480]{px}$ at a frequency of \unit[30]{Hz}.
+Additionally to the computer vision system, an \gls{ac:imu} is placed on the robot.
+All software components run as modular and parallel nodes using \gls{ac:ros}.
+
+
+
+
+
+\subsection{Noise and outlier detection}
+\label{ssec:perception_methods_noiseandoutlierdetection}
+
+Let $\Phi(i, j)$ be the observed image. 
+Then the noisy image is defined as
+\begin{align}
+  \Phi\left(i,j\right) = u\left(i,j\right) + n\left(i,j\right),
+\end{align}
+where $u\left(i,j\right)$ is the ``true'' value and $n\left(i,j\right)$ is noise at image position $\left(i,j\right)^T$. 
+Here, noise is modeled as Gaussian white noise, meaning $n\left(i,j\right)$ is Gaussian distributed with zero mean and variance $\sigma^2$.
+Additionally, salt-and-pepper noise is added: a fixed percentage of color channels will be set to either $0$ or its maximum value.
+The filter $D_h$, with filter parameter $h$, is defined as follows
+\begin{align}
+  \Phi &= D_{h}(\Phi) + n
+\end{align}
+meaning, that for an optimal filter
+\begin{align}
+  u &= D_h(u+n)
+\end{align}
+should be true. 
+The filter parameter $h$ should depend only on the variance of the noise $h = h(\sigma)$. 
+Later, for evaluation the \gls{ac:rmse} and \gls{ac:psnr} between the original image $u$ and the filtered $D_h(u+n)$ is computed.
+
+
+\begin{figure}[t]
+  \centering
+  \input{./figures/perception/methods/noiseandoutlierremoval/flowchart.tex}
+    \caption{Overview of the system structure. A detailed explanation of all steps is shown in \secref{ssec:perception_methods_noiseandoutlierdetection}.}
+  \label{fig:perception_methods_noiseandoutlierremoval_flowchart}
+\end{figure}
+
+A flowchart of the proposed algorithm \gls{ac:epf} is shown in \figref{fig:perception_methods_noiseandoutlierremoval_flowchart}, a detailed explanation of all steps follows in the next sections.
+First, the image $\Phi$ is divided into a) subwindows $\Psi$ sized $N = k \cdot l$, where each subwindow is shifted by one pixel relative to the last one, such that there are as many subwindows as there are pixels in the image. 
+Each subwindow is then b) smoothed using a Gaussian kernel. 
+Subwindow size $k \times l$ and Gaussian smoothing parameter are hyperparameters, which need to be manually tuned.
+However, all three heavily depend on the amount of noise you would want to remove. 
+For each subwindow centered around pixel position $(i, j)^T$ a c) distance matrix $\Delta_{i,j}$ and a mean distance $\delta_{i,j}^m$ is computed in the color domain. 
+This offers a measurement for noise, as described below. 
+A user selected d) threshold $\tau$, which defines a threshold between noise and a mere color edge, is applied to $\Delta_{i,j}$ and $\delta_{i,j}^m$. 
+In case of noise, e) a weight $\omega_{i,j}$ is computed, which will move the color values of the pixel in the subwindow to the mean color of the subwindow.
+
+\begin{figure}
+    \centering
+    \includegraphics[width=0.75\textwidth]{./figures/sensor/method_boundaryconditions.jpg}
+    \caption{Periodic mirrored boundary conditions are used for image subwindows. A red rectangle denotes borders of original image.}
+    \label{fig:method_boundaryconditions}
+\end{figure}
+
+
+
+
+
+\subsubsection{Division into subwindows} 
+
+Let one pixel at position $(i, j)^T$ contain the color information
+\begin{eqnarray}
+   \bm{\varphi}_{i,j} = ( \varphi_{i,j}^r,\ \varphi_{i,j}^g,\ \varphi_{i,j}^b )^T. 
+\end{eqnarray}
+A subwindow $\Psi^{\left(i,j\right)}$ is created around $(i, j)^T$, such that $(i, j)^T$ is centered. 
+In case the subwindow contains an image boundary, periodic mirrored boundary conditions are used as visualized in \figref{fig:method_boundaryconditions}. 
+The size of the subwindow is defined by $k \times l$ and a pixel's position inside the subwindow will be denoted by $(r, s)^T$.
+This implies $0 \leq r < k$ and $0 \leq s < l$. 
+Please note that other than rectangular shaped windows are possible.
+In this work, additionally disc-shaped and Gaussian shaped subwindows were tried, however results differed only marginally.
+
+
+
+
+
+\subsubsection{Smoothing} 
+
+Each subwindow is smoothed via a Gaussian kernel~\cite[p. 257f]{gonzalezwoods2002}. 
+This removes outliers, which would otherwise distort the computation of the mean as described in the next step.
+
+
+
+
+
+\subsubsection{Computation of the distance matrix}
+
+For each subwindow $\Psi^{\left(i,j\right)}$ the arithmetic mean is calculated as
+\begin{eqnarray}
+  \bm{\psi}_{m}^{\left(i,j\right)} = \frac{1}{N} \left( \sum_{r,s} \psi_{r,s}^r,\ \sum_{r,s} \psi_{r,s}^g,\ \sum_{r,s} \psi_{r,s}^b \right)^T
+\end{eqnarray}
+where $N = k \cdot l$ denotes the size of the subwindow. The pixelwise distances
+\begin{eqnarray}
+  \delta_{r,s}^{\left(i,j\right)} = | \bm{\psi}_{r,s} - \bm{\psi}_{m}^{\left(i,j\right)} |_2
+\end{eqnarray}
+are stored in a matrix $\Delta^{\left(i,j\right)}$. Furthermore, for each subwindow $\Psi^{\left(i,j\right)}$ the mean pixelwise distance 
+\begin{eqnarray}
+  \delta_m^{\left(i,j\right)} = \frac{1}{N} \sum_{r,s} \delta_{r,s}^{\left(i,j\right)}
+\end{eqnarray}
+is calculated.
+
+
+
+
+
+\subsubsection{Thresholding}
+
+Using a threshold it is now analyzed, whether a subwindow contains a color edge (and therefore no pixels should be smoothed), whether one pixel contains an outlier (and should be corrected), or neither, which means the pixel value should also not be replaced.
+If $\delta_m^{\left(i,j\right)}$ is large, the subwindow contains big color variations.
+This means the subwindow includes a color edge.
+If $\delta_m^{\left(i,j\right)}$ is small, but one single pixel holds a big color variations (large $\delta_{r,s}^{\left(i,j\right)}$), there is an outlier, which needs to be replaced.
+If both, $\delta_m^{\left(i,j\right)}$ and $\delta_{r,s}^{\left(i,j\right)}$ are small, the pixel holds a ``normal color'' value.
+A threshold $\tau$ is introduced to identify noisy pixels and color edges, yielding
+\begin{eqnarray}
+  \psi_{r,s} =  \begin{cases}
+    \textrm{color\ edge} & \textrm{,\ if\ } \delta_m^{\left(i,j\right)} > \tau, \\
+    \textrm{noise} & \textrm{,\ if\ } \delta_m^{\left(i,j\right)} \leq \tau \textrm{\ and\ } \delta_{r,s} > \tau, \\
+    \textrm{neither} & \textrm{,\ else}.
+  \end{cases} \label{eqn:decision_noise_edge}
+\end{eqnarray}
+
+
+
+
+
+\subsubsection{Update of RGB values}
+
+A new image $\Theta$, holding the pixel values $\bm{\theta}_{i,j}$ is computed based upon the squared distance of the user based threshold $\tau$ and the pixelwise distance $\delta_{r,s}$. 
+$\bm{\theta}_{i,j}$ is updated as follows
+\begin{eqnarray}
+  \bm{\theta}_{i,j} &\longleftarrow& \bm{\theta}_{i,j} + \psi_{r,s} \cdot \left( \tau - \delta_{r,s}^{\left(i,j\right)} \right)^2 \cdot \bm{\psi}_{m}^{\left(i,j\right)}.
+\end{eqnarray}
+Please note, that due to the sliding subwindows each pixel is updated $N= k \cdot l$ times and therefore needs to be normalized. Thus, an additional weight $\Omega$ is introduced for each pixel $\omega_{i,j}$ as
+\begin{eqnarray}
+  \omega_{i,j} &\longleftarrow& \omega_{i,j} + \psi_{r,s} \cdot \left( \tau - \delta_{r,s}^{\left(i,j\right)} \right)^2.
+  \label{eq:method_weightupdate}
+\end{eqnarray}
+The final image results from division of $\Theta$ by $\Omega$. 
+In rare cases $\tau = \delta_{r,s}^{\left(i,j\right)}$ for large image patches may happen, which will result in $\omega_{i,j} = 0$ according to \eqnref{eq:method_weightupdate}.
+To avoid division by zero it is suggested to initialize $\Omega$ with ones instead of zeros (since in general $\omega_{i,j} \gg 0$, this does not change the final outcome significantly).
+
+\begin{figure}
+  \centering
+  \input{./figures/sensor/method_example.tex}
+  \caption{On the left a grayscale image, which needs to be filtered, is shown. For visualization purposes $\unit[100]{px}$ (marked in red) are chosen for detailed analysis and plotted in the large graph. Each pixel has Gaussian noise (variance of 1) added, additionally pixel 10 contains an outlier. At pixel 50 there is a color edge. In blue the same pixels are shown after being processed by the filter. The left subplot contains one subwindow sized $\unit[9 \times 1]{px}$. Pixel 10 is smoothed out, since the mean pixelwise color distance $\delta_m$ is low and thus pixel 10 is identified as outlier. The right subgraph shows another subwindow, which detects a color edge. $\delta_m$ is greater than threshold $\tau$ and therefore no values are smoothed inside this subwindow.}
+  \label{fig:sensor_method_example}
+\end{figure}
+
+An example for these subwindows can be seen in \figref{fig:sensor_method_example}. 
+For demonstration purposes a simple 1d grayscale image holding 100 pixels is shown. 
+Each pixel has low variance Gaussian noise added. 
+Pixel 10 was manually set to a significant higher value; at pixel 50 a color edge begins. 
+Noisy pixel 10 is identified, since the mean pixelwise color distance $\delta_m$ is quite low, while the pixelwise color distance $\delta_{r,s}$ is large; thus pixel 10 is smoothed out. 
+At the color edge the mean pixelwise distance is greater than the threshold $\delta_m > \tau$, which is interpreted correctly as a color edge and thus no value in the shown subwindow is smoothed out. 
+
+However, one problem arises, when the subwindow contains only one pixel from the color edge. 
+This one pixel cannot safely be differentiated between noise and color edge --- even for a human this would be an impossible task. 
+Therefore, pixels at the border of the subwindow are not smoothed, when detected as noise.
+
+A formulation of \gls{ac:epf} in the continuous domain can be found in the appendix \secref{sec:appendix_formulationoftheedgepreservingfilterinthecontinuousdomain}.
+
+
+
+
+
+\subsection{Visual Odometry algorithm}
+\label{ssec:perception_methods_visualodometryalgorithm}
+
+
+
+
+In this section, it is shown how to estimate the \gls{ac:aav}'s pose from omnidirectional monocular RGB images.
+An overview of the proposed system is given in \figref{fig:perception_methods_visualodometryalgorithm_flowchart}.
+First, in b) features and the optical flow is computed based on the raw camera image.
+The example frame, which is taken from simulation~\cite{zhang2016benefit}, that is shown in \figref{fig:perception_methods_visualodometryalgorithm_flowchart}, can be found enlarged in \figref{fig:robot_methods_flowchart_enlargement_features}.
+A discussion about the utilized feature set is listed below.
+Next, the image is c) dewarped.
+Again, an enlarged example frame is shown in \figref{fig:robot_method_systemstructure_enlargement_transform}.
+This enables the robot to estimate the pose change from the last camera frame.
+In d), an \gls{ac:ekf}~\cite{kalman1960new} fuses the visual odometry 6 \gls{ac:dof} results with the 6 \gls{ac:dof} of the Inertial Measurement Unit.
+The visual odometry's covariance for the Kalman filter can be computed by a non-linear least squares solution from the visual odometry algorithm.
+Afterwards, a PID controller adjusts the motor controllers to manipulate the quadrocopter into the goal pose (which is defined by \eg SLAM~\cite{Williams20091188}, corridor flight algorithms~\cite{Tregillus:2017:HOV:3025453.3025521,verbeke2016constraint}, \etc).
+A list of all tracked features is kept and their relative position to the robot may be estimated via e) triangulation.
+This f) point cloud can be used by high level algorithms for map building or navigation tasks.
+
+\begin{figure}[]
+  \centering
+  \input{./figures/perception/methods/visualodometryalgorithm/flowchart.tex}
+  \caption{Pipeline of proposed algorithm. Details are outlined in \secref{ssec:perception_methods_visualodometryalgorithm}. Enlargements of images in b) and c) can be found in \figref{fig:robot_methods_flowchart_enlargement}.}
+  \label{fig:perception_methods_visualodometryalgorithm_flowchart}
+\end{figure}
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \includegraphics[width=0.65\textwidth]{./figures/robot/method_systemstructure_features_frame.jpg}
+    \caption{Computed features and optical flow are shown in green.}
+    \label{fig:robot_methods_flowchart_enlargement_features}
+  \end{subfigure}\\
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \includegraphics[width=0.9\textwidth]{./figures/robot/method_systemstructure_transform_canyonfeatures.jpg}
+    \caption{Transformation from mirror to robot coordinate system (not all features shown for visualization purposes).}
+    \label{fig:robot_method_systemstructure_enlargement_transform}
+  \end{subfigure}
+  \caption{Enlargement of example frames b) and c) from \figref{fig:perception_methods_visualodometryalgorithm_flowchart}.}
+  \label{fig:robot_methods_flowchart_enlargement}
+\end{figure}
+
+
+
+
+
+\subsubsection{Camera Calibration}
+
+In order to compute motion from camera images, the intrinsic parameters of the camera system need to be known.
+This can be done by utilizing a model for catadioptric camera systems as proposed by~\cite{scaramuzza2006flexible}.
+For that case, the projection equation for image points $(u,v)^T$ is given by
+\begin{equation}
+ \lambda
+ \begin{bmatrix}
+  u\\
+  v\\
+  a_0+a_1p+\cdots+a_{n}p^{n}
+ \end{bmatrix} =
+ \begin{bmatrix}
+  x\\
+  y\\
+  z
+ \end{bmatrix} \text{,}
+\end{equation}
+with \[p = \sqrt {u^2+v^2}\] and $a_0$, $a_1$, $\dots$, $a_n$ being the intrinsic calibrated parameters depending on the camera system. 
+This model assumes that camera and mirror are well aligned.
+Since the camera and mirror frame is rigid, the assumption holds in all tested use cases.
+However, if this were not the case, an affine transformation on the computed points is needed.
+If all parameters of the camera and the used mirror in a catadioptric system are known, one can calculate point projections as follows.
+
+
+
+
+
+\subsubsection{Transformations between image and world coordinates}
+
+% The prime collides with the vector arrow in $\vec o'$. We adjust the spacing globally.
+\let\originalprime\prime
+\renewcommand{\prime}{\,\originalprime}
+\newcommand{\atanii}{\ensuremath{\mathrm{atan2}}}
+
+In the following, the transformations $T_H$ from image space to the external frame of reference and their inverse $T_H^{-1}$ are derived.
+Object positions in image space are denoted using 2d coordinates $\vec o' = ( o'_x, o'_y)^T$ in cartesian or polar coordinates $( \rho, \phi )^T$.
+Their counterparts in the external frame of reference are denoted as $\vec o \R3$.
+The robot's pose in the external frame of reference is determined by its position $\vec c$ and orientation $\vec q$:
+This is the pose of the camera's view as shown in \figref{fig:robot_method_algorithms_mirror_sphere_front} and \figref{fig:robot_method_algorithms_mirror_hyperbola_top}.
+Using the real world radius $r$ and radius $r'$ in image space, the reflection's position on the mirror can be computed independently of camera parameters using the scaling factor $s = \,^r\!/_{r'}$.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[]{0.3\textwidth}
+    \centering
+    \includegraphics[height=3.55cm]{./figures/robot/photos/mirror.jpg}
+    \caption{Photo of the hyperbola mirror.}
+    \label{fig:robot_method_algorithms_mirror_hyperbolaphoto}
+  \end{subfigure}\hfill
+  \begin{subfigure}[]{0.3\textwidth}
+    \centering
+    \input{./figures/robot/mirror_sphere_front.tex}
+    \caption{Camera view of the mirror.}
+    \label{fig:robot_method_algorithms_mirror_sphere_front}
+  \end{subfigure}\hfill
+  \begin{subfigure}[]{0.3\textwidth}
+    \centering
+    \input{./figures/robot/method_algorithms_mirror_hyperbola_top.tex}
+    \caption{Side view of hyperbola mirror.}
+    \label{fig:robot_method_algorithms_mirror_hyperbola_top}
+  \end{subfigure}
+  \caption{Sketch of a camera observing an object $\vec{o}$, which appears at position $\vec o'$ in the image plane (b). In Figure (c) the camera is pointed at a hyperbolic mirror.}
+  \label{fig:robot_method_algorithms_mirror}
+\end{figure}
+
+\newcommand{\Fi}{\ensuremath{\mathcal{F}_1}}
+\newcommand{\Fii}{\ensuremath{\mathcal{F}_2}}
+
+The surface of a hyperbolic mirror is defined by
+\begin{equation}
+  \frac{y^2}{a^2} - \frac{x^2}{b^2} = 1 \quad,~a, b \R{1}
+\end{equation}
+with the semi-major axis $a$. 
+The focal points $\mathcal{F}_{1,2}$ are set apart by \[{2\sqrt{a^2 + b^2} =: 2\epsilon}\] (\figref{fig:robot_method_algorithms_mirror_hyperbola_top}).
+The robot's position is defined by the point in the middle of these two focal points.
+The camera's focal point coincides with $\Fii$.
+With ${\vec e}$ being the unit vector pointing from the reflection on the mirror towards the object's position $\vec o$:
+
+\begin{equation}
+  \nonumber
+  \vec e_H(\vec o') =
+    \frac{\left( s \, \vec o'_x, s \, \vec o'_y, \frac{a}{b} \sqrt{\rho^2 + b^2} - \varepsilon \right)^\intercal}
+    {\left| \left( s \, \vec o'_x, s \, \vec o'_y, \frac{a}{b} \sqrt{\rho^2 + b^2} - \varepsilon \right)^\intercal \right|} \quad \text{,}
+\end{equation}
+
+the transformation $T_H$ is
+
+\begin{equation}
+  \nonumber
+  \begin{aligned}
+    T_H: & \vec o' \longmapsto \vec o : \\
+    \vec o = & \vec c + R(\vec q)
+    \left( \begin{array}{c}
+             s o'_x\\
+             s o'_y\\
+             \frac{a}{b} \sqrt{\rho(\vec o')^2 + b^2}
+           \end{array} + d \vec e_H(\vec o') \right) \quad \text{.}
+    \end{aligned}
+\end{equation}
+
+and therefore the object position at a distance $d$ is defined as $\vec o = \vec r + R \left( \hat{\vec o} + \Di \vec e \right)$.
+For the inverse transformation in polar coordinates, it can be shown that the radius $\rho'$ is given by
+
+\begin{equation}
+  \rho' = \frac{\left( \vec o - \vec c \right)_\rho}{\left( \vec o - \vec c \right)^2_\rho \cdot \varepsilon^2 / b^2 -1}
+         \left( \left( \vec o - \vec c \right)_z \varepsilon + a \right) \quad \text{.}
+\end{equation}
+
+To simplify these expressions, the rotation matrix $R$ was left out.
+Different camera orientations $\vec q$ are accounted for by rotating the vector $\left( \vec o - \vec c \right)$ before calculations.
+The corresponding image position is now found as $\vec o' = \left( \rho \cos \phi, \rho \sin \phi \right)^\intercal$.
+
+
+
+
+
+\subsubsection{Feature Set}
+
+As already mentioned, features are first computed on the raw camera image.
+Features are points in an image, which are easy to find, recognize, and track in consecutive frames --- usually areas rich in texture.
+Afterwards, the optical flow is computed using these features.
+There are numerous publications comparing different feature algorithms --- the most prominent algorithms include FAST~\cite{Rosten2006}, GFTT~\cite{shi1994}, ORB~\cite{rublee2011orb}, SIFT~\cite{lowe1999object}, and SURF~\cite{bay2006}.
+Here, FAST is used as it offers a good trade-off between computational complexity and quality of found features~\cite{Elgayar2013175, Heinly2012}.
+Then, the optical flow is estimated using a pyramidical implementation of the Lucas-Kanade method~\cite{bouguet2001pyramidal}.
+
+
+
+
+
+\subsubsection{Motion and Depth Estimation}
+
+Now, one can compute the robot's displacement (translation and rotation) between consecutive frames.
+A list of all features for all frames is kept, which means the position of each feature relative to multiple robot positions is available.
+This enables the robot to perform triangulation.
+While in theory one would get a good estimate, real world experiments show that quite a lot of noise gets introduced.
+
+Estimating the depth for $N$ features adds significant complexity to the problem.
+Currently, \gls{ac:evo} tries to estimate the quadrocopter's 6d motion $M$ --- consisting of translation $\Delta \vec r$ and orientation $\Delta \vec q$.
+Our problem has now increased to $N + 6$ dimensions.
+Changes in the feature set from frame $\vec i_{i, t-1}$ to frame $\vec i_{i, t}$ provide $N$ equations, meaning features need to be tracked for at least $3$ consecutive frames.
+
+\newcommand{\pr}{\ensuremath{{\,p}}}
+\paragraph{Computing the feature correspondence}
+\begin{enumerate}
+  \item Depth $d_{i,t-1}$ and motion $M_{t}$ are initialized using previous data $d_{i,t-2}$ and motion $M_{t-1}$. The camera pose $P_{t-1}$, consisting of position $\vec c_{t-1}$ and rotation $\vec q_{t-1}$, is known.
+  \item For every feature $i$, calculate the global position $\vec o_{i,t - 1}$ using the depth $d_{i,t-1}$, the image coordinates $\vec o'_{i,t - 1}$ and the camera pose $P_{t-1}$ using the transformation $T_H$.
+  \item Apply the inverse motion to all global positions $\vec o_{i, t-1}$. This results in the predicted global positions $\vec o^\pr_{i, t}$.
+  \item Use the inverse transformation $T^{-1}_H$, to compute the predicted image position $\vec{o}'^{p}_{i, t} = T^{-1}_H \left( \vec{o}^\pr_{i, t} \right)$.
+  \item Lastly, the environment as well as all global features is considered to be static. Therefore, one may minimize the sum of the squared distances for the last $L$ time steps:
+  \[\textrm{SD} \left( d_{i, t}, M \right) = \sum_{i=0}^{N} \sum_{t=-L}^{0} \left\lVert \vec o'_{i,t} - \vec o^{\prime p}_{i,t} \right\rVert^2 .\]
+\end{enumerate}
+
+\paragraph{Estimating the depth with the forward estimation}
+\begin{enumerate}
+  \item Perform step 1. and 2. from the inverse estimation.
+  \item The goal is to find the new depth $d_{i, t}$ based on the previous estimate $d_{i, t-1}$.
+    %In the pinhole model, the depth is defined as the $y$-component of the difference between the object position $\vec o_i$ and the camera position $\vec c$:
+    %${d_{t} = \left( R \left( \Delta \vec{q}_{t} \right) \left( \vec o - \vec c_{t-1} - \Delta \vec c_t \right) \right)_y \, \text{.}}$
+    In omnidirectional mirror models, the depth is
+    \[{d_{t} = \left\lVert R \left( \Delta \vec{q}_{t} \right) \left( \vec o - \vec c - \Delta \vec c_t \right) - \hat{\vec o}^{\,p} \, \right\rVert \, \text{.}}\]
+    The new reflection point $\hat{\vec o}^p$ is calculated with the inverse transformation $T^{-1}_H$.
+  \item Compute the new predicted pose $P_{t} = P_{t-1} + M_{t}$.
+  \item Compute predicted global positions $\vec o^\pr_{i, t=0}$ for every feature $i$ based on the camera model.
+  \item The positions $\vec o_{i, t}$ and $\vec o^\pr_{i, t}$ should be equal for corresponding features $i$. We use this to minimize the sum of the squared distances
+\begin{equation}
+  \nonumber
+  \textrm{SD} \left( d_{i, t}, M \right) = \sum_{i=0}^{N} \sum_{\tau=-L}^{0} \left\lVert \frac{ \vec o_{i,t-\tau} - \vec{o}^\pr_{i, t-\tau}}{d_{i,t-\tau}} \right\rVert^2.
+\end{equation}
+Now, $d_{i,t}^{-1}$ weights all summands consistently as the position-error scales linearly with $d$.
+\end{enumerate}
+
+
+
+
+
+\subsubsection{Maximum angular resolution}
+
+Given a fixed camera resolution of $\unit[480 \times 480]{px}$ one can now compute the projection of the hyperbola mirror onto the camera. 
+It is assumed that the object is at a distance of $\unit[2]{m}$ and five pixels width to separate it from adjacent objects are required. 
+After straightforward application of the above formulas, the limit is derived as approximately $1.3\degree$.

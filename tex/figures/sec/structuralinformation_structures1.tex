@@ -1,0 +1,16 @@
+% Define block styles
+\tikzstyle{block} = [rectangle, fill=white, text centered, minimum height=0.5em, rounded corners=false]
+\tikzstyle{arrow} = [draw, -latex]
+
+\definecolor{red1}{RGB}{160,0,0}
+\definecolor{green1}{RGB}{0,160,0}
+\definecolor{blue1}{RGB}{0,0,160}
+
+	      
+\begin{tikzpicture}[node distance=6em, auto]
+	% single
+	\node [block] (S1) {Support};
+	\node [block, above of=S1] (M1) {\textcolor{red1}{Main}};
+
+	\draw [] (S1.north) to (M1.south);
+\end{tikzpicture}

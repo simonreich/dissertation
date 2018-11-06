@@ -1,0 +1,40 @@
+\subsection{Discussion and conclusion}
+\label{sec:sensor_discussion}
+
+Here, a novel real-time edge preserving denoising filter is presented, which replaces noisy areas by uniformly colored patches. 
+Performance is significantly better than other standard methods on 2d images. 
+Artificial 1d data shows similar results.
+
+In~\cite{gu2014weighted} a comparison to other methods is given, including state-of-the-art methods like BM3D~\cite{dabov2007image}, EPLL~\cite{zoran2011learning}, or LSSC~\cite{mairal2009non} based on the Berkeley Data Set~\cite{arbelaez2011contour}. 
+All these methods exploit the image nonlocal redundancies, in contrast to \gls{ac:epf}, which uses a local neighborhood. 
+In \tabref{tab:sensor_discussion_psnr} a comparison between the proposed \gls{ac:epf} algorithm and other state-of-the-art methods is shown.
+Clearly, the proposed method performs slightly worse than other recent algorithms.
+On the contrary the review~\cite{shao2014heuristic} performs a conclusive study on computational complexity. 
+According to this work, one of the fastest algorithms, BM3D, manages to denoise not more than one image sized $\unit[256 \times 256]{px}$ per second. 
+This is far from real-time and not feasible for robotic applications or critical sensor readings. 
+A comparison to the proposed \gls{ac:epf} filter is shown in \tabref{tab:sensor_experiments_resfps}.
+
+\begin{table}[]
+  \centering
+  \begin{tabular}{ccc}
+    \toprule
+    Gaussian Noise  & Recent Methods & EPF\\
+    \midrule
+    $\sigma = 10$   & $33.5 - 34.8$ & $30.7$\\
+    $\sigma = 30$   & $27.8 - 29.2$ & $23.0$\\
+    $\sigma = 50$   & $25.1 - 26.8$ & $19.9$\\
+    $\sigma = 100$  & $21.6 - 23.6$ & $15.5$\\
+    \bottomrule
+  \end{tabular}
+  \caption{PSNR values computed on the Berkeley data set for state-of-the-art methods (as shown in~\cite{gu2014weighted}) compared to the proposed \gls{ac:epf} filter.}
+  \label{tab:sensor_discussion_psnr}
+\end{table}
+
+This means, the proposed \gls{ac:epf} performs only slightly worse than recent denoising methods, but offers real-time performance, which makes the filter applicable to video streams and hence can be used in the future as a component inside the perception-action loop of robotic applications.
+It enables image processing and data filtering on embedded hardware, for example in flying robots, which is another research area of ours.
+The filter not only works well in the image domain, but can be extended to data of any dimension, \eg noisy 6d point cloud data.
+This is demonstrated in this work by filtering 1d sensor data.
+
+This concludes the first part of this chapter.
+In the second part, the focus lies on two different kind of robots, one ground based and one flying, which make use of this algorithm.
+In fast moving systems, as it is the case for the flying robot, a new set of problems arise: here, robust computer vision methods, small error margins, and safe fallback values in cases of error are essential.

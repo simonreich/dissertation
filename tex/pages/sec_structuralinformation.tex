@@ -1,0 +1,80 @@
+\subsection{Structural information}
+\label{ssec:action_methods_structuralinformation}
+
+Semantic Event Chains offer a good understanding of top or bottom and the now introduced Enriched Semantic Event Chains additionally express ``left'' and ``right''.
+This gives valuable information on how to execute an action, but very little information, whether an action is feasible.
+In this chapter structural topologies of object graphs are analyzed.
+For visualization, we will assume in this chapter that object segmentation and recognition performs in a perfect manner.
+Furthermore, one must assume that the support of an object is always below the object itself and that the object recognition software provides knowledge about the supporting objects, \eg if a table is present, the table is marked as supporting object.
+This also marks the constraints of this approach: Hanging structures are not analyzed here.
+
+As noted in \secref{ssec:action_methods_actioncategories}, an action will always be performed on the \emph{main} object.
+To analyze the structure around the \emph{main} object, subgraphs are created, where one subgraph always holds the support and the \emph{main} object, and up to one other object, which is called \emph{primary} object.
+Remarkably, there are only three possible topological subgraphs to which all scenes that include the \emph{main} object can be reduced.
+These three possible cases are shown in \figref{fig:sec_structuralinformation_structures}:
+
+\begin{enumerate}
+  \item The \emph{main} object has only one touching relation. The touched object is a support (see \figref{fig:sec_structuralinformation_structures_1}). A real world example could be a plate lying on a table.
+  \item The \emph{main} object has two touching relations. One is a support, the second one is another object, which is also touching a support (see \figref{fig:sec_structuralinformation_structures_2}). A real world scene could be a plate and a cup on a table, both are touching each other.
+  \item The \emph{main} object has two touching relations. One is a support, the second one is another object, which does not touch a support (see \figref{fig:sec_structuralinformation_structures_3}). Lastly, this structure could emerge from a plate with an apple on top; the plate being the \emph{main} object here.
+\end{enumerate}
+
+\begin{figure}[]
+  \begin{subfigure}[]{0.3\textwidth}
+    \centering
+    \input{./figures/sec/structuralinformation_structures1.tex}
+    \caption{Example: Plate on a table.}
+    \label{fig:sec_structuralinformation_structures_1}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[]{0.3\textwidth}
+    \centering
+    \input{./figures/sec/structuralinformation_structures2.tex}
+    \caption{Example: Plate next to a cup on a table.}
+    \label{fig:sec_structuralinformation_structures_2}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[]{0.3\textwidth}
+    \centering
+    \input{./figures/sec/structuralinformation_structures3.tex}
+    \caption{Example: Apple on a plate on a table.}
+    \label{fig:sec_structuralinformation_structures_3}
+  \end{subfigure}
+  \caption{Only these three subgraphs may exist around the \emph{main} object. Any graph structure, which contains at least a \emph{main} object and its support, can be reduced to a series of these subgraphs. Any subgraph consists of the \emph{main} object, its support, and up to one more object.}
+  \label{fig:sec_structuralinformation_structures}
+\end{figure}
+
+Next, a real-world example as shown in \figref{fig:sec_structuralinformation_example_scene} is analyzed.
+The computer vision system delivers a low level graph structure, but also two pieces of high level information: which object is the table/the support and what is the \emph{main} object.
+The supporting object is important, because it is always below all other objects.
+The objects are named analogously to \secref{ssec:action_methods_actioncategories}, meaning the manipulated object is called \emph{main} object.
+The resulting graph is decomposed into two subgraphs: one tower-like structure and one structure where the \emph{primary} is situated next to the \emph{main} object.
+\glspl{ac:sec} do not offer information about size, and the bottle O$_1$ could be far away of the plate -- it is therefore disregarded.
+
+\begin{figure}
+  \centering
+  \begin{subfigure}[]{0.475\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{./figures/sec/structuralinformation_example_scene.jpg}
+    \caption{The original scene as viewed by the robot. A higher level algorithm (or human) chooses the plate as \emph{main} object to manipulate}
+    \label{fig:sec_structuralinformation_example_scene}
+  \end{subfigure}\hfill%
+  \begin{subfigure}[]{0.475\textwidth}
+    \centering
+    \input{./figures/sec/structuralinformation_example_graph.tex}
+    \caption{The extracted graph relations after object classification. Plate is recognized as \emph{main} object.}
+  \end{subfigure}\vspace{0.5cm}\\%
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sec/structuralinformation_example_subgraph.tex}
+    \caption{The abstract graph is cut into two subgraphs around the \emph{main} object, the plate. As the bottle has no direct connection to the plate, no subgraph is generated. As the subgraph consists of at least the support and \emph{main} object, the third object is automatically named \emph{primary} object, see \secref{ssec:action_methods_affordanceofsemanticeventchains}. ``O'' stands for other, not closer defined objects.}
+  \end{subfigure}
+  \caption{A scene, as recorded by a robot is analyzed and a graph structure is generated. As \emph{main} object the plate is chosen by either human or higher level algorithms. For each object around the \emph{main} object a subgraph is generated.}
+  \label{fig:sec_structuralinformation_example}
+\end{figure}
+
+Now, the complex graph structure is broken down to much simpler subgraphs.
+It is already well known that the mere existence of objects already suggests scenes~\cite{zhu2014reasoning}: For example, an image of a plate, cutlery, a roll, and a glass of juice will more likely show a breakfast scene, than an image of a supermarket.
+But an isle inside a supermarket could show the same objects from the breakfast scene (and probably many more at the same time) in a different context.
+One can easily see, that a scene's affordance heavily depends on discriminative spatial layouts~\cite{tran2017recognition, lin2014learning}.
+In the next section, it is analyzed how the subgraphs can be used as additional features to \glspl{ac:esec} to compute a scene's affordance.

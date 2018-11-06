@@ -1,0 +1,44 @@
+\section{Discussion and conclusion}
+\label{sec:robot_conclusion}
+
+In this chapter, a novel lightweight omnidirectional camera setup for fast moving robots is investigated.
+All computations are performed online on the robot.
+\gls{ac:vo} is evaluated using two simulated environments.
+Then, \gls{ac:vo} is combined with \gls{ac:imu} data.
+The resulting pose information is confirmed on a real robot using external tracking and via measuring the final displacement during an office flight.
+
+The achieved frame rate of $\unit[15 \pm 3]{Hz}$, as shown in~\tabref{tab:robot_experiments_framerate}, is sufficient for real-time application in autonomous agents with low-power hardware.
+A real world example gives an understanding of the error margins: A self localization error of $\unit[0.1]{m}$ and a frame rate of $\unit[15]{Hz}$ is assumed.
+Furthermore, we will assume that the \gls{ac:aav} needs 5 frames to detect an obstacle and initiate counter measures.
+Using the given frame rate of $\unit[15]{Hz}$, the quadrocopter needs approximately $\unit[0.33]{s}$ to detect an obstacle.
+Within these $\unit[0.33]{s}$ the safety error margin of $\unit[0.1]{m}$ (the above localization error) must not be met.
+Thus, we can survey in indoor environments with a maximum velocity of approximately $\unit[1.1]{km/h}$.
+This allows for a broad range of application, \eg fast search and rescue in impassable terrain.
+
+First, the EVO algorithm is tested in simulation on two benchmarks.
+It is shown that it performs significantly better than current state-of-the-art methods.
+
+Next, the robot is tracked via an external camera system.
+The deviation between external tracking and the robot's internal believe state was found to be $\unit[5 \pm 3]{cm}$ in manual mode on average; in real flight self localization performs at $\unit[9 \pm 4]{cm}$.
+The utilized external tracking system performs already with an error of at least $\unit[\pm 1]{cm}$~\cite{haggag2013measuring} and thus introduces significant uncertainty.
+
+As in \gls{ac:vo} algorithms the error accumulates over time and is hard to measure on short trajectories; Therefore, a real world office flight with a trajectory of $\unit[19.4 \pm 0.1]{m}$ length is flown.
+While the robot started and landed on the same spot, the robot's internal believe state shows a displacement of about $\unit[0.10 \pm 0.01]{m}$.
+This leads to an error of $0.5\pm 0.1\%$, which is about the same as in the ``Indoor'' simulation environment.
+Here, the robot had a displacement of $\unit[0.14\pm 0.01]{m}$ on a $\unit[28]{m}$ trajectory.
+For comparison: the \unit[400]{m} ``Urban Canyon'' data set contains an error of approximately $6.8\%$.
+
+This work enables autonomous robots to localize themselves, while allowing at the same time to build a depth map.
+This map offers for example obstacle avoidance or mapping capabilities.
+All computations are performed online on embedded hardware, meaning that the robot is able to work in unknown environments.
+It can support autonomously, for example, in search and rescue mission, disaster relief work, or exploration tasks.
+
+Several points currently remain future work:
+
+\begin{itemize}
+  \item Evaluation of long term flights via tracking the robot's position with external cameras. For example, high precision Vicon cameras offer sub millimeter accuracy at $\unit[120]{Hz}$~\cite{windolf2008systematic}.
+  \item Currently, at each frame a full pose update is computed. This is, however, computationally expensive. One could, based on the last pose updates and based upon the assumption that on small time scales not too much changes, compute a new pose via \gls{ac:vo} only, if the \gls{ac:imu} indicates a large change.
+  \item The current method is fully data driven. This bottom-up method has proven to be useful in an unknown and possible unstructured environment, \eg after an earthquake inside a house. However, one could use some high level features, \eg ``door frame might be an opening to adjacent room'' for navigation.
+  \item As currently a map is built, there is no loop closure detection. This would lead to a full Simultaneous Localization and Mapping approach.
+  \item Last, one should devise more benchmarks for evaluation against other methods. However, creating a fully simulated environment is very tedious.
+\end{itemize}

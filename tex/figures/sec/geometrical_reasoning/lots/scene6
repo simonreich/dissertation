@@ -1,0 +1,55 @@
+Simulated SEC
+
+    0 1 2 3 4 5 6 7 8 9
+   ---------------------
+0 | 1 0 0 0 0 0 0 0 0 0
+1 | 0 2 0 0 0 0 0 0 1 0
+2 | 0 0 3 0 0 0 0 1 0 0
+3 | 0 0 0 4 0 0 0 0 0 0
+4 | 0 0 0 0 5 0 0 0 0 0
+5 | 0 0 0 0 0 6 1 0 0 0
+6 | 0 0 0 0 0 1 7 0 0 0
+7 | 0 0 1 0 0 0 0 8 0 0
+8 | 0 1 0 0 0 0 0 0 9 0
+9 | 0 0 0 0 0 0 0 0 0 9
+
+Solved as:
+Planning Tree Branch 0  Length 3
+0 Checked: 0    Initialized by: -1      Current plan: push from x to y Object 3 to Object 6
+Planning Tree Branch 0  Length 3
+0 Checked: 0    Initialized by: -1      Current plan: push from x to y Object 3 to Object 6
+
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0][ INFO] [1439810885.164650842]: Call successfull
+Nr: 0   20 3 6 
+0 3
+Allowed Actions:
+Nr: 0   1 
+Nr: 1   1 
+Nr: 2   1 
+Nr: 3   1 
+Nr: 4   1 
+Nr: 5   1 
+Nr: 6   1 
+Nr: 7   1 
+Nr: 8   1 
+Nr: 9   1 
+Nr: 10  1 
+Nr: 11  0 
+Nr: 12  1 
+Nr: 13  1 
+Nr: 14  1 
+Nr: 15  1 
+Nr: 16  1 
+Nr: 17  1 
+Nr: 18  1 
+Nr: 19  1 
+Nr: 20  1 
+Nr: 21  1 
+Nr: 22  1 
+Nr: 23  1 
+Nr: 24  1 
+Nr: 25  1 
+Nr: 26  1 
+Nr: 27  0 
+Nr: 28  1 
+Nr: 29  1 

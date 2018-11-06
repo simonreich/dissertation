@@ -1,0 +1,19 @@
+% Define block styles
+\tikzstyle{block} = [rectangle, fill=white, text centered, minimum height=0.5em, rounded corners=false]
+\tikzstyle{arrow} = [draw, -latex]
+
+\definecolor{red1}{RGB}{160,0,0}
+\definecolor{green1}{RGB}{0,160,0}
+\definecolor{blue1}{RGB}{0,0,160}
+
+	      
+\begin{tikzpicture}[node distance=6em, auto]
+	% touching
+	\node [block, right of=S1, node distance=5cm] (S2) {Support};
+	\node [block, above of=S2, xshift=-1cm] (M2) {\textcolor{red1}{Main}};
+	\node [block, above of=S2, xshift= 1cm] (Se2) {Primary};
+
+	\draw [] (S2.north) to (M2.south);
+	\draw [] (S2.north) to (Se2.south);
+	\draw [] (M2.east) to (Se2.west);
+\end{tikzpicture}

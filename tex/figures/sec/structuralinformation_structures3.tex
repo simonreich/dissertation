@@ -1,0 +1,18 @@
+% Define block styles
+\tikzstyle{block} = [rectangle, fill=white, text centered, minimum height=0.5em, rounded corners=false]
+\tikzstyle{arrow} = [draw, -latex]
+
+\definecolor{red1}{RGB}{160,0,0}
+\definecolor{green1}{RGB}{0,160,0}
+\definecolor{blue1}{RGB}{0,0,160}
+
+	      
+\begin{tikzpicture}[node distance=6em, auto]
+	% tower
+	\node [block, right of=S2, node distance=5cm] (S3) {Support};
+	\node [block, above of=S3, node distance=3em] (M3) {\textcolor{red1}{Main}};
+	\node [block, above of=M3, node distance=3em] (Se3) {Primary};
+
+	\draw [] (S3.north) to (M3.south);
+	\draw [] (M3.north) to (Se3.south);
+\end{tikzpicture}

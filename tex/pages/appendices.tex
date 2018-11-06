@@ -1,0 +1,58 @@
+\section{Edge-Preserving Filter in the continuous domain}
+\label{sec:appendix_formulationoftheedgepreservingfilterinthecontinuousdomain}
+
+Let $\bm{f}(\bm{x})$ define the smoothed input image, $\bm{h}(\bm{x})$ the output image, $\bm{c}( \bm{\zeta},\ \bm{x})$ measures the geometric closeness defined by $\bm{\zeta}$ around $\bm{x})$, and $\bm{s}(\bm{f} ( \bm{\zeta}),\ \bm{f} ( \bm{x} ))$ the photometric similarity.
+As the filter targets color images, bold letters refer vectors, which also may contain RGB values.
+In this section $|\cdot|$ also refers to per-element-multiplication instead of vector multiplication. 
+In this approach, noise needs to be detected first based on the user-defined parameter $\tau$.
+If noise is detected, it should be removed, and in case of a color edge, the edge should be preserved.
+Therefore, a mean value $\bm{m} (\bm{x})$ is defined as:
+\begin{eqnarray}
+  \bm{m} (\bm{x}) &=& \bm{k}^{-1}_m(\bm{x}) \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \bm{f} \left( \bm{\zeta} \right) \cdot \bm{c} \left( \bm{\zeta},\ \bm{x} \right) \Di \bm{\zeta} \nonumber \\
+  \bm{k}_m (\bm{x}) &=& \int_{-\infty}^{\infty} \int_{-\infty}^{\infty} \bm{c} \left( \bm{\zeta},\ \bm{x} \right) \Di \bm{\zeta}
+\end{eqnarray}
+and a distance function 
+\begin{eqnarray}
+  d \left( \bm{f} \left( \bm{x} \right),\ \bm{m} \left( \bm{x} \right) \right) = \left| \bm{f} \left( \bm{x} \right) - \bm{m} \left( \bm{x} \right) \right|,
+\end{eqnarray}
+which results in the pixelwise distance. 
+The mean value $\bm{m} (\bm{x})$ now holds the average color value inside a spatial neighborhood of $\bm{x}$ and $d$ holds the color distance from the pixel to the average $\bm{m} (\bm{x})$. 
+If the spatial neighborhood holds only small scaled noise, a low pixelwise distance $d$ is expected, as well as a low average pixelwise distance in the spatial neighborhood $\bm{c}$:
+\begin{eqnarray}
+  p \left( \bm{x} \right) &=& k^{-1}_p \iint_{-\infty}^{\infty} d \left( \bm{f}(\bm{\zeta}),\ \bm{m}(\bm{x}) \right) \bm{c} \left( \bm{\zeta},\ \bm{x} \right) \Di \bm{\zeta} \nonumber \\
+  k_p (\bm{x}) &=& \iint_{-\infty}^{\infty} \bm{c} \left( \bm{\zeta},\ \bm{x} \right) \Di \bm{\zeta} .
+\end{eqnarray}
+
+Therefore, the decision can be based on a threshold $\tau$ as
+\begin{eqnarray*}
+  \bm{h}(\bm{x}) = \bm{k}^{-1}_R(\bm{x}) \cdot \begin{cases}
+      \iint_{-\infty}^{\infty} \bm{f} \left( \bm{\zeta} \right) \cdot \bm{c} \left( \bm{\zeta},\ \bm{x} \right) \cdot \bm{s} \left( \bm{\zeta},\ \bm{x} \right) \Di \bm{\zeta} & p \leq \tau \\
+      \iint_{-\infty}^{\infty} \bm{f} \left( \bm{\zeta} \right) \cdot \bm{c} \left( \bm{\zeta},\ \bm{x} \right) \cdot \bm{s} \left( \bm{\zeta},\ \bm{x} \right) \Di \bm{\zeta} & p \leq \tau, d > \tau\\
+      \iint_{-\infty}^{\infty} \bm{f} \left( \bm{\zeta} \right) \cdot \bm{c} \left( \bm{\zeta},\ \bm{x} \right) \Di \bm{\zeta} & \textrm{else},
+  \end{cases}
+  \label{eq:continuous_output}
+\end{eqnarray*}
+where $k_R$ is the respective normalization. 
+$d$ can now be used to distinguish large scale noise. 
+A 2d step function
+\begin{eqnarray}
+  \bm{c} \left( \bm{\zeta},\ \bm{x} \right) = \begin{cases}
+    1 & \bm{x} - \bm{a} \leq \bm{\zeta} \leq \bm{x} + \bm{b} \\
+    0 & \textrm{else}
+  \end{cases},
+\end{eqnarray}
+holding the conditions $\bm{a}, \bm{b}, \bm{e} \in \mathbb{R}^2_{\geq 0} | \bm{a} + \bm{b} = \bm{e}$ with a fixed $\bm{e}$ is used.
+This generates a rectangle of the size $\bm{e}$ around $\bm{x}$. 
+As this definition is not feasible in the continuous domain as it generates a non-finite number of subwindows to calculate, in the discrete case however every pixel is checked and updated according to its neighborhood $\bm{e}$.  
+As a measure for similarity a squared distance is used
+\begin{eqnarray}
+  \bm{s}\left( \left(\bm{\zeta}\right),\ \bm{x} \right) = (\tau - d( \bm{f}(\bm{x}),\ \bm{m}(\bm{x}) ))^2 |\bm{m} (\bm{x})|
+\end{eqnarray}
+and the Euclidean norm. 
+In case of noise detection the output is moved to the mean. 
+The maximum size of the step can be adjusted via the threshold $\tau$. 
+
+
+
+
+

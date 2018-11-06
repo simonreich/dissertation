@@ -1,0 +1,39 @@
+Error: !Object1Allowed.at (Plan) && !Object2Allowed.at (Plan)
+Solved as:
+Planning Tree Branch 0  Length 3
+0 Checked: -1   Initialized by: -1      Current plan: push from x to y Object 3 to Object 2
+
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0][ INFO] [1439803057.255420081]: Call successfull
+Nr: 0   20 3 2 
+0 3
+Allowed Actions:
+Nr: 0   1 
+Nr: 1   1 
+Nr: 2   1 
+Nr: 3   1 
+Nr: 4   1 
+Nr: 5   1 
+Nr: 6   1 
+Nr: 7   1 
+Nr: 8   1 
+Nr: 9   1 
+Nr: 10  0 
+Nr: 11  0 
+Nr: 12  1 
+Nr: 13  1 
+Nr: 14  1 
+Nr: 15  1 
+Nr: 16  1 
+Nr: 17  1 
+Nr: 18  1 
+Nr: 19  1 
+Nr: 20  1 
+Nr: 21  1 
+Nr: 22  0 
+Nr: 23  1 
+Nr: 24  1 
+Nr: 25  1 
+Nr: 26  1 
+Nr: 27  0 
+Nr: 28  0 
+Nr: 29  0 

@@ -1,0 +1,144 @@
+\subsection{Enriched Semantic Event Chains}
+\label{ssec:action_methods_enrichedsemanticeventchains}
+
+As seen in the last chapter, for robot execution of Semantic Event Chains, some additional pose information must be included.
+Therefore, \glspl{ac:sec} are enriched by higher level structural information.
+Each entry of one keyframe matrix now may not only hold ``T'', ``N'', or ``A'', but also an additional vector containing the relative pose between the two objects.
+An example can be seen in \figref{fig:sec_examplescenario_pushing_firstkeyframe}, which is similar to the first keyframe in the example \figref{fig:sec_examplescenario_pushing}, but introduces an additional coordinate system.
+Following this approach, the Semantic Event Chain turns into an \gls{ac:esec} as
+
+\begin{figure}
+  \centering
+  \input{./figures/sec/secexample_pushing_firstkeyframe.tex}
+  \caption{This is the same scene as shown in \figref{fig:sec_examplescenario_pushing} --- a robot pushing the \emph{main} object along its support. Please note the coordinate system, which is used when the keyframe matrix on the right is enriched by relative pose information, see \eqnref{eqn:sec_enriched_2d}. For clarity only two dimensions are used here (where $y=0$).}
+  \label{fig:sec_examplescenario_pushing_firstkeyframe}
+\end{figure}
+
+\begin{align}
+  \bordermatrix{
+    & 0 & 1 & 2\cr
+    0 & \colorbox{green120}{0}    & (\textup{T},~(0,~0,~1))         & (\textup{N},~(0,~0,~1))\cr
+    1 & (\textup{T},~(0,~0,~-1))  & \colorbox{green120}{1}          & (\textup{N},~(-0.71,~0,~0.71))\cr
+    2 & (\textup{N},~(0,~0,~-1))  & (\textup{N},~(0.71,~0,~-0.71))  & \colorbox{green120}{2}\cr
+    },
+  \label{eqn:sec_enriched_2d}
+\end{align}
+
+where the ID is marked in green.
+A more general form for the keyframe matrix $\underline{K}$ is
+
+\begin{align}
+  \underline{K} := \begin{pmatrix}
+    a_{0,0}         & \vec{a}_{1,0} & \cdots & \vec{a}_{i,0}    & \cdots & \vec{a}_{N,0}\\
+    \vec{a}_{0,1}   & \ddots        &        &                  &        & \vdots\\
+    \vdots          &               &        &                  &        &\\
+    \vec{a}_{0,j}   &               &        &                  &        &\\
+    \vdots          &               &        &                  &        &\\
+    \vec{a}_{0,N}   & \cdots        &        &                  &        & a_{N,N}\\
+  \end{pmatrix}
+  \label{eqn:sec_enriched_general}
+\end{align}
+
+where
+
+\begin{align}
+  a_{i,i} := i
+\end{align}
+
+and for $i\neq j$
+
+\begin{align}
+  \vec{a}_{i,j} := \left( r,~\vec{p}_0,~\cdots,~\vec{p}_m,~\cdots,~\vec{p}_k\right).
+\end{align}
+
+The scalar entries ``T'', ``N'', and ``A'' are replaced by vectors of the form $(r,~\vec{p}_m)$, where relation $r \in \{\textup{T},~\textup{N},~\textup{A}\}$ and $\vec{p}_m \in \Re^d$.
+The vector $\vec{p}_m$ is normalized to unit length such that $|\vec{p}_m| \overset{!}{=} 1$.
+
+One might expect that one vector is enough to define the relative pose between two objects.
+However, using only one vector often does not catch the shape of the other object.
+For example, one might imagine a simple cube, surrounded by an L-shaped block.
+Here, at least two vectors are needed to describe the directions, in which the cube must not be moved in order to not touch the L-shaped block.
+In these experiments, as will be shown below, up to $k=8$ different pose vectors per relation are allowed.
+Below, an algorithm for 3d geometrical reasoning is devised, which will output these vectors.
+Parts of this section have been published in~\textcite{reichaeinwoergoetter2018}.
+
+
+
+
+%\subsection{3d Geometrical reasoning}
+
+First, please imagine a \action{pick \& place} action.
+It is quite difficult to determine the ``correct'' rotation of the hand to pick up an object.
+Additionally, if the scene is cluttered, it is often hard to tell in which direction the hand should move to lift the object and to not touch any other objects.
+Here, a geometrical reasoning algorithm is needed, which will output this information.
+As already mentioned, there is --- due to Semantic Event Chains --- a good understanding of top and bottom of the scene.
+However, the question which objects are left and right of the \emph{main} object remain.
+Most certainly the robot will also encounter objects of different sizes and shapes, which must be taken into account, too.
+
+Currently, the vast field of different robot hardware and use cases has shown that geometric reasoning algorithms do not generalize well.
+For example, in~\cite{havur2014geometric} the focus lies on computing efficiently the relative position of multiple moving objects to each other; results are shown only in simulation.
+In~\cite{erdem2011combining} geometric reasoning is combined with a causal symbolic planner, which in turn is used in an industrial use case.
+On a more abstract layer,~\cite{marin2009towards} defines attention space using low level geometric features.
+Thresholds define a space around the robot for human-robot collaboration.
+In~\cite{subburaj2007high, subburaj2009automated, lee2009geometric} geometric reasoning is used to infer information about local structures.
+These are used in medical robots~\cite{subburaj2007high, subburaj2009automated}.
+
+As of today there is no labeled benchmark for geometric reasoning in real world scenarios.
+Thus quantitative evaluation is not very meaningful as one would need to generate the ground truth first.
+This, however, is hardware specific, robot dependent, and does not generalize.
+
+\begin{figure}[]
+  \begin{subfigure}[]{0.4\textwidth}
+    \centering
+    \includegraphics[height=4cm]{./figures/sec/geometrical_reasoning/blocks.png}
+    \caption{Two blocks serve as an example for geometric reasoning. Here, one is interested in which direction the green cube can be moved without touching the blue one.}
+    \label{fig:sec_enriched_geometricalreasoning_approach_overview_blocks}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[]{0.55\textwidth}
+    \centering
+    \input{./figures/sec/geometrical_reasoning/histogram/histogram.tex}
+    \caption{First, the distances from all voxels of the green block to all voxels from the blue block are binned. In the next step all voxels of the green block, which are below the maximum of the histogram (marked in red) are taken into account.}
+    \label{fig:sec_enriched_geometricalreasoning_approach_overview_histogram}
+  \end{subfigure}\\
+  \begin{subfigure}[]{0.4\textwidth}
+    \centering
+    \includegraphics[height=4cm]{./figures/sec/geometrical_reasoning/blocks_marked.png}
+    \caption{The voxels found in \figref{fig:sec_enriched_geometricalreasoning_approach_overview_histogram} are marked in red. Normals of these voxels are computed and k-means clustering of the normals is performed (here: $k=2$).}
+    \label{fig:sec_enriched_geometricalreasoning_approach_overview_blocksmarked}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[]{0.55\textwidth}
+    \centering
+    \input{./figures/sec/geometrical_reasoning/clusterdirections.tex}
+    \caption{A half sphere around each of the $k=2$ resulting vectors is spawned (here: half circle for visualization) and the union of all spheres is computed. The union, above marked in red, marks the ``forbidden'' directions.}
+    \label{fig:sec_enriched_geometricalreasoning_approach_overview_clusterdirections}
+  \end{subfigure}
+  \caption{Step-by-step explanation of the geometric reasoning algorithm.}
+  \label{fig:sec_enriched_geometricalreasoning_approach_overview}
+\end{figure}
+
+A step-by step explanation is shown in \figref{fig:sec_enriched_geometricalreasoning_approach_overview}.
+For visualization purposes the relative position of two cubes to each other is analyzed: one green and one blue.
+In a very simple approach, one could reduce the objects to one point in space, for example its mean or average position.
+This, however, will ignore object sizes as well as shapes.
+Instead, a more general solution, which does not depend on object size, shape, or distance is sought.
+First, the distance from each voxel from one cube to each voxel in the other cube is computed and binned as shown in \figref{fig:sec_enriched_geometricalreasoning_approach_overview_blocks} and \figref{fig:sec_enriched_geometricalreasoning_approach_overview_histogram}.
+For two symmetrical objects a Poisson shaped distribution is to be expected.
+All voxels, which are below the first maximum and belong to the green cube are taken into consideration; these points are marked red in the histogram.
+The corresponding voxels are marked in \figref{fig:sec_enriched_geometricalreasoning_approach_overview_blocksmarked} in red, too.
+Next, the normals of these voxels are calculated.
+These normals will, as per definition, point away from the green cube and will always point towards the blue cube.
+These normals are clustered using a k-means clustering algorithms.
+While undersegmentation will be harmful --- as not all directions are found --- but oversegmentation is not, a $k$ that is greater than the expected number of directions is used.
+It was found heuristically that $k \approx 8$ leads to good results for most real-world examples.
+Lastly, a half sphere around each resulting cluster is spawned (half circle in 2d as shown in the example in \figref{fig:sec_enriched_geometricalreasoning_approach_overview_clusterdirections}).
+The union of all spheres points to the blocked directions, which is marked in red in the example --- the direction where the blue cube is located at.
+This computation is performed for each object, which is in a certain radius around the \emph{main} object.
+The radius is hardware dependent and defined by how much space the robot hand needs to safely grasp or push an object.
+
+One could now devise a library of actions: Each action is combined with a robot-hardware specific set of trajectories.
+Parameters, which are needed for execution, \ie where an object is located or from what angle it is safe to approach, can be generated in an automated manner by the here proposed geometric reasoning algorithm.
+One such library for the Kuka Lightweight Robot was developed in collaboration with this work and published in~\cite{aeinaksoytamosiunaite2013}.
+This library will be used during the next sections for action execution.
+However, before one proceeds to the execution phase, one needs to analyze the structural information of \glspl{ac:esec} in more detail.

@@ -1,0 +1,648 @@
+\section{Results}
+\label{perception_results}
+
+In this section, we will first look at the user controlled parameters, the subwindow size $N$ (\secref{ssec:perception_results_subwindowsize}) and the threshold $\tau$ (\secref{ssec:perception_results_threshold}).
+The Gaussian smoothing parameters, which are also hyperparameters, heavily depend on the data type: is the filter too strong, the final image will be blurry; a filter too weak will not smooth enough.
+Heuristically a kernel sized $\unit[5]{px}$ and $\sigma = 0.3$ was found to work very well for all images in the data sets.
+Afterwards, the proposed filter is compared to the bilateral filter, simple Gaussian kernel, Median filter, and Non-local-means filter. 
+Lastly, an analysis of the computational complexity and real-time implementations is performed.
+
+While many other robots perform indoor navigation, only few are able to do so without external computing power: for example~\cite{engel2012accurate, forster2014svo, kerl2013robust, forster2017svo}.
+The main requirement for successful employment of \gls{ac:vo} based methods is to obtain high accuracy and robustness given a limited computational budget.
+The joint optimization of structure, \ie landmarks, and motion, \ie the robot's pose, is commonly called bundle adjustment~\cite{triggs1999bundle, forster2017svo}.
+Thus, to separate problems stemming from \gls{ac:vo} and problems arising from the flight controller, the next section analyzes the proposed algorithm using two simulations and compare results to current state-of-the-art (\secref{ssec:perception_results_visualodometryinsimulation}).
+
+Afterwards, real-world measurements are shown, where \gls{ac:vo} data is fused with \gls{ac:imu} pose information, \secref{ssec:perception_results_externallytrackedindoorflights}.
+Here, ground truth is generated via external tracking.
+Only short trajectories are used in this section due to camera limitations.
+In the next section, long term real world flights are shown (\secref{ssec:perception_results_officeindoorflight}).
+Lastly, the \gls{ac:vo} algorithm's time performance is evaluated, please see \secref{ssec:perception_results_timeperformanceofvisualodometryalgorithm}.
+
+
+
+\subsection{Effect on denoising of different subwindow sizes}
+\label{ssec:perception_results_subwindowsize}
+
+\begin{figure}[]
+  \centering
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/experiments_subwindowsize_key.tex}
+  \end{subfigure}\vspace{0.25cm}\\
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/experiments_subwindowsize_3.tex}
+    \caption{Subwindow size of $N = \unit[3]{px}$.}
+    \label{fig:sensor_experiments_subwindowsize_3}
+  \end{subfigure}\\
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/experiments_subwindowsize_9.tex}
+    \caption{Subwindow size of $N = \unit[9]{px}$.}
+    \label{fig:sensor_experiments_subwindowsize_9}
+  \end{subfigure}\\
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/experiments_subwindowsize_29.tex}
+    \caption{Subwindow size of $N = \unit[29]{px}$.}
+    \label{fig:sensor_experiments_subwindowsize_29}
+  \end{subfigure}
+  \caption{Shown is the effect of different subwindow sizes on one data set: A one dimensional grayscale image containing a color edge at pixel 25 and one outlier at pixel 10. Detailed explanations are shown in text, see~\secref{ssec:perception_results_subwindowsize}.}
+  \label{fig:sensor_experiments_subwindowsize}
+\end{figure}
+
+First, we will have a look at the effect of the most important user controlled parameter: the size of the subwindow $N$. 
+Since each pixel is $N$ times checked, the computational complexity increases linearly with $N$. 
+This parameter also controls the amount of noise, which is either classified as noise or color edge. 
+In \figref{fig:sensor_experiments_subwindowsize} a one dimensional grayscale image is shown.
+It contains a color edge at pixel 25 and one outlier at pixel 10.
+It is filtered using three different subwindow sizes $N = \unit[3,9,15]{px}$ and for each size the color edge is preserved. 
+For $N = \unit[3]{px}$, \figref{fig:sensor_experiments_subwindowsize_3},  the filter follows the data more closely; this also means that an outlier, as shown in pixel 10 in the data sample, has a greater influence on the filtered data. 
+For a subwindow size of $N = \unit[9]{px}$, see \figref{fig:sensor_experiments_subwindowsize_9}, the data is more heavily smoothed and the outlier is almost not visible in the filtered data. 
+In \figref{fig:sensor_experiments_subwindowsize_29} a subwindow size of $N = \unit[29]{px}$ was chosen. 
+Since the color edge begins at pixel 26, it will be present in almost all subwindows due to the periodic boundary conditions. 
+On the left side however, the outlier increases the mean pixelwise distance, such that these pixels are always detected as ``containing a color edge'' and are not smoothed at all.
+Only the right side, which does not contain the artificial outlier, is smoothed.
+
+Thus, the subwindow controls the spatial size of a color edge to be detected.
+
+
+
+
+
+\subsection{Effect on denoising of different thresholds $\tau$}
+\label{ssec:perception_results_threshold}
+
+Next, we will analyze the effect of the threshold $\tau$, this is depicted in \figref{fig:sensor_experiments_threshold}. 
+As shown in \secref{ssec:perception_methods_noiseandoutlierdetection}, $\tau$ controls the maximum step size for detecting noise and color edges. 
+In \figref{fig:sensor_experiments_threshold_10} a threshold of $\tau = 10$ is used, which is small enough to detect the color step and smooth the outlier. 
+A larger threshold of $\tau = 15$, used in \figref{fig:sensor_experiments_threshold_15}, already introduces some smoothing at the color edge. 
+Please also note, that the outlier pixel at position 10 is not any more detected as noise; instead it begins to affect the smoothing of its neighboring pixels. 
+A large threshold of $\tau = 30$ can be seen in \figref{fig:sensor_experiments_threshold_30}; 30 is by far bigger than any data point and consequently everything will be smoothed. 
+The color edge is not preserved any more.
+
+Thus, the threshold $\tau$ controls the maximum height of a color edge to be detected.
+
+\begin{figure}[]
+  \centering
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/experiments_subwindowsize_key.tex}
+  \end{subfigure}\vspace{0.25cm}\\
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/experiments_threshold_10.tex}
+    \caption{Threshold of $\tau = 10$.}
+    \label{fig:sensor_experiments_threshold_10}
+  \end{subfigure}\\
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/experiments_threshold_15.tex}
+    \caption{Threshold of $\tau = 15$.}
+    \label{fig:sensor_experiments_threshold_15}
+  \end{subfigure}\\
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/experiments_threshold_30.tex}
+    \caption{Threshold of $\tau = 30$.}
+    \label{fig:sensor_experiments_threshold_30}
+  \end{subfigure}
+  \caption{Shown is the effect of three different thresholds on one data set: A one dimensional grayscale image containing a color edge at pixel 25 and one outlier at pixel 10. Detailed explanations are shown in text, see~\secref{ssec:perception_results_threshold}.}
+  \label{fig:sensor_experiments_threshold}
+\end{figure}
+
+
+
+
+
+\subsection{Denoising of 2d images}
+
+The images are corrupted first by  adding Gaussian distributed noise to each pixel and each color channel using a standard deviation of $\sigma_c = 5$. 
+Additionally, salt-and-pepper noise (s\&p noise) is added to one color channel of 4\% of all pixels. 
+For benchmarking the Berkeley Segmentation Data set and Benchmark~\cite{arbelaez2011contour} (500 images) and the 2014 testing set of the Common Objects in Context Data Set (Coco Data Set)~\cite{lin2014microsoft} (40775 images) is used.
+
+The corrupted image is then given to a simple Gaussian blurring filter (kernel size: \unit[$5 \times 5$]{px}, $\sigma_{x,y} = 2$), a bilateral filter ($\sigma_c = 110$, $\sigma_s = 5$)~\cite{tomasi1998bilateral}, a median blurring filter (kernel size: \unit[$3$]{px})~\cite[p. 129f]{sonka2014image}, a non-local-means filter ($h_d = \unit[7]{px}$, $h_c = \unit[7]{px}$, template window: $\unit[7 \times 7]{px}$, search window: $\unit[21 \times 21]{px}$)~\cite{buades2005non}, and our proposed filter (subwindow: image size divided by 150, but at least $\unit[10 \times 10]{px}$, threshold $\tau = 10$). 
+The denoised image is compared to the uncorrupted image using \gls{ac:rmse}, defined as
+\begin{align}
+  \operatorname{RMSE}= \sqrt{\frac{\sum_{i=1}^n \left( \phi_{original} - \phi_{denoised} \right)^2}{n}},
+  \label{eq:rmse}
+\end{align}
+and \gls{ac:psnr}:
+\begin{align}
+  \operatorname{PSNR} = 20 \cdot \log_{10} \left( \frac{\max(\phi_{original})}{\operatorname{RMSE}} \right).
+  \label{eq:psnr}
+\end{align}
+All filter parameters listed above were chosen to minimize \gls{ac:rmse} and maximize \gls{ac:psnr}.
+Results are shown in \tabref{tab:experiments_rmsepsnr} and will be discussed in the next section.
+Image examples are provided in \figref{fig:sensor_experiments_examples}.
+
+\begin{figure}[!ht]
+  \centering
+  \begin{subfigure}[]{0.22\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/29030_noisy_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/90076_noisy_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/12003_noisy_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/65010_noisy_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/12084_noisy_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/65033_noisy_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/100007_noisy_frame.jpg}%
+    \caption{Noisy image.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[]{0.22\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/29030_bilateral_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/90076_bilateral_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/12003_bilateral_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/65010_bilateral_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/12084_bilateral_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/65033_bilateral_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/100007_bilateral_frame.jpg}%
+    \caption{Bilateral Filter.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[]{0.22\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/29030_nonlocalmeans_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/90076_nonlocalmeans_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/12003_nonlocalmeans_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/65010_nonlocalmeans_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/12084_nonlocalmeans_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/65033_nonlocalmeans_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/100007_nonlocalmeans_frame.jpg}%
+    \caption{NLM Filter.}
+  \end{subfigure}\hfill
+  \begin{subfigure}[]{0.22\textwidth}
+    \centering
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/29030_edgefilter_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/90076_edgefilter_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/12003_edgefilter_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/65010_edgefilter_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/12084_edgefilter_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/65033_edgefilter_frame.jpg}\vspace{0.1cm}\\
+    \includegraphics[width=\textwidth]{./figures/sensor/berkeley/100007_edgefilter_frame.jpg}%
+    \caption{Proposed EPF.}
+  \end{subfigure}%
+  \caption{Visual comparison of filter results. Quantitative results are shown in \tabref{tab:experiments_rmsepsnr}. Images taken from Berkeley Image Data Set~\cite{arbelaez2011contour}.}
+  \label{fig:sensor_experiments_examples}
+\end{figure}
+
+The proposed filter achieves on both data sets the best performance markers. 
+In the discussion, see \secref{sec:perception_discussion}, the results are also compared to more recent, state-of-the-art algorithms.
+
+\begin{table}[]
+  \centering
+  \begin{tabular}{lcccc}
+    \toprule
+      & \multicolumn{2}{c}{Berkeley Data Set}    & \multicolumn{2}{c}{Coco Data Set}\\
+      & RMSE  & PSNR                       & RMSE  & PSNR\\
+    \midrule
+    Original        & $17.95$ & $23.31$ & $17.31$ & $23.33$\\
+    EPF             & \bm{$7.06$} & \bm{$31.05$} & \bm{$7.89$} & \bm{$30.47$}\\
+    Bilateral       & $10.41$ & $27.75$ & $10.43$ & $28.01$\\
+    Gaussian        & $14.59$ & $25.08$ & $15.69$ & $24.81$\\
+    Median          & $14.04$ & $25.63$ & $14.91$ & $25.54$\\
+    NLM             & $11.40$ & $26.86$ & $12.28$ & $26.44$\\
+    \bottomrule
+  \end{tabular}
+  \caption{\gls{ac:rmse} and \gls{ac:psnr} computed on the Berkeley Data Set (500 images) and the Coco Data Set (40775 images). The first line ``Original'' refers to the not denoised image. The error is $\pm 0.01$ for all values.}
+  \label{tab:experiments_rmsepsnr}
+\end{table}
+
+
+
+
+
+\subsection{Denoising of 1d sensor data}
+
+As already suggested in \figref{fig:sensor_method_example}, \figref{fig:sensor_experiments_subwindowsize}, and \figref{fig:sensor_experiments_threshold}, the filter can also be applied to 1d data. 
+This may happen, for example, as a post-processing step for sensor readings. 
+The filter is tested on three different settings: first, an alternating line, which switches every 100 samples its height to either $f(x) = f_{min}$ or $f(x) = f_{max}$; second, a sawtooth wave defined by $f(x) = x - \operatorname{floor}_{100}(x)$; and third, a sinusoidal wave $f(x) = \sin{2 \pi x / 250}$ with a wave length of 250 data points.
+Every data line consists of a total length of 1000 samples.
+To each scenario either Gaussian noise with variance of $\sigma = 10$, salt-and-pepper noise (to 5\% of samples), or both is added. 
+Visual examples are shown in \figref{fig:sensor_experiments_1d_altline}, \figref{fig:sensor_experiments_1d_sawtooth}, and \figref{fig:sensor_experiments_1d_sinus}.
+
+Again, the proposed filter ($N = 11$, $\tau = 30$) is compared to a Gaussian blurring filter (kernel: \unit[$7 \times 7$]{px}, $\sigma_{x,y} = 3$), a bilateral filter ($\sigma_c = 30$, $\sigma_s = 30$, and a median filter (kernel size: \unit[$9$]{px}). 
+\gls{ac:rmse} and \gls{ac:psnr} is computed according to \eqnref{eq:rmse} and \eqnref{eq:psnr}.
+On each setting 1000 trials are performed and averaged.
+Results are shown in \tabref{tab:experiments_1d_rmsepsnr}.
+
+In almost all experiments \gls{ac:epf} outperforms other standard 1d filtering methods.
+While the median filter performs very well on salt-and-pepper noise, it is not edge preserving and thus introduces artefacts on edges.
+The bilateral filter on the other hand, handles edges very well, but has significant trouble with removing salt-and-pepper noise.
+The proposed \gls{ac:epf} filter performs well on both, Gaussian and salt-and-pepper noise and is edge preserving.
+
+  \begin{table}[]
+  \centering
+  \begin{tabular}{c l cc|cc|cc}
+    \toprule
+    && \multicolumn{2}{c}{Gauss}    & \multicolumn{2}{c}{s\&p}& \multicolumn{2}{c}{Gauss and s\&p}                \\
+    &             & RMSE         & PSNR          & RMSE          & PSNR          & RMSE          & PSNR           \\
+    \midrule
+    \multirow{5}{*}{\rotatebox[origin=c]{90}{\makecell{1) Alternating\\Line \vspace{0.25cm}\\ \includegraphics[width=1.5cm]{./figures/sensor/experiments_alternatingline.png}}}} & No denoising & $10.0$       & $22.3$        & $15.2$        & $16.4$         & $18.1$        & $17.2$        \\
+    &EPF          & \bm{$2.6$}   & \bm{$32.3}$   & \bm{$3.9$}    & \bm{$28.5$}    & \bm{$5.1$}    & \bm{$26.7$}   \\
+    &Bilateral    & $6.9$        & $25.3$        & $15.2$        & $16.4$         & $16.5$        & $17.7$        \\
+    &Gaussian     & $6.0$        & $25.3$        &  $7.8$        & $22.2$         &  $8.7$        & $22.1$        \\
+    &Median       & $5.1$        & $26.8$        &  $4.1$        & $27.9$         &  $6.0$        & $25.4$        \\
+    \midrule
+    \multirow{5}{*}{\rotatebox[origin=c]{90}{\makecell{2) Sawtooth\\Wave \vspace{0.25cm}\\ \includegraphics[width=1.5cm]{./figures/sensor/experiments_sawtooth.png}}}} & No denoising &  $10.0$       & $21.6$        & $14.1$        & $17.1$        & $17.1$        & $17.0$        \\
+    &EPF          &  \bm{$3.7$}   & \bm{$29.3$}   & \bm{$4.6$}    & \bm{$26.5$}   & \bm{$6.6$}    & \bm{$24.5$}   \\
+    &Bilateral    &  $7.0$        & $24.4$        & $14.0$        & $17.1$        & $15.5$        & $17.5$        \\
+    &Gaussian     &  $7.6$        & $22.6$        &  $8.8$        & $20.9$        &  $9.6$        & $20.6$        \\
+    &Median       &  $5.7$        & $25.2$        &  $5.8$        & $24.9$        &  $7.4$        & $23.1$        \\
+    \midrule
+    \multirow{5}{*}{\rotatebox[origin=c]{90}{\makecell{3) Sinusoidal\\Wave \vspace{0.25cm}\\ \includegraphics[width=1.5cm]{./figures/sensor/experiments_sinusoidal.png}}}} & No denoising & $10.0$        & $20.1$        & $12.9$        & $17.8$        & $16.1$        & $16.0$        \\
+    &EPF          & \bm{$2.7$}    & \bm{$29.5$}   &  $2.6$        & $29.8$        & \bm{$4.4$}    & \bm{$25.6$}   \\
+    &Bilateral    & $6.7$         & $23.0$        & $12.8$        & $17.9$        & $14.4$        & $16.9$        \\
+    &Gaussian     & $3.9$         & $26.7$        &  $5.0$        & $24.2$        &  $6.3$        & $22.6$        \\
+    &Median       & $4.1$         & $26.1$        & \bm{$0.6$}    & \bm{$46.1$}   &  $4.5$        & $25.6$        \\
+    \bottomrule
+  \end{tabular}
+  \caption{Comparison of \gls{ac:rmse} and \gls{ac:psnr} computed on three different scenarios: 1) an alternating line, 2) a sawtooth wave, and 3) a sinusoidal wave. To each scene three different noise types (Gaussian, salt-and-pepper (s\&p), or both) are added, resulting in 9 different experiments. Each experiment is repeated 1000 times and averaged; the error is $\pm 0.1$ for all values.}
+  \label{tab:experiments_1d_rmsepsnr}
+\end{table}
+
+\begin{figure}[]
+  \centering
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/1d/1d_altline-sp.tex}
+    \caption{Only salt\&pepper noise, density $p = 5\%$.}
+  \end{subfigure}
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/1d/1d_altline-gauss.tex}
+    \caption{Only Gaussian noise, mean of $1$ and standard deviation $\sigma = 10$.}
+  \end{subfigure}
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/1d/1d_altline-gauss+sp.tex}
+    \caption{Both, salt\&pepper (density $p = 5\%$) and Gaussian noise (mean of $1$ and $\sigma = 10$).}
+  \end{subfigure}
+  \caption{Examples of different denoising algorithms on stepwise data.}
+  \label{fig:sensor_experiments_1d_altline}
+\end{figure}
+
+\begin{figure}[]
+  \centering
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/1d/1d_sawtooth-sp.tex}
+    \caption{Only salt\&pepper noise, density $p = 5\%$.}
+  \end{subfigure}
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/1d/1d_sawtooth-gauss.tex}
+    \caption{Only Gaussian noise, mean of $1$ and standard deviation $\sigma = 10$.}
+  \end{subfigure}
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/1d/1d_sawtooth-gauss+sp.tex}
+    \caption{Both, salt\&pepper (density $p = 5\%$) and Gaussian noise (mean of $1$ and $\sigma = 10$).}
+  \end{subfigure}
+  \caption{Examples of different denoising algorithms on sawtooth data.}
+  \label{fig:sensor_experiments_1d_sawtooth}
+\end{figure}
+
+\begin{figure}[]
+  \centering
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/1d/1d_sinus-sp.tex}
+    \caption{Only salt\&pepper noise, density $p = 5\%$.}
+  \end{subfigure}
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/1d/1d_sinus-gauss.tex}
+    \caption{Only Gaussian noise, mean of $1$ and standard deviation $\sigma = 10$.}
+  \end{subfigure}
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sensor/1d/1d_sinus-gauss+sp.tex}
+    \caption{Both, salt\&pepper (density $p = 5\%$) and Gaussian noise (mean of $1$ and $\sigma = 10$).}
+  \end{subfigure}
+  \caption{Examples of different denoising algorithms on sinusoidal data.}
+  \label{fig:sensor_experiments_1d_sinus}
+\end{figure}
+
+
+
+
+
+\subsection{Time performance of denoising algorithm}
+
+Average frame rates for differently sized images are computed in \tabref{tab:sensor_experiments_resfps}. 
+100 images from the validation data set from~\cite{arbelaez2011contour} were used and the results averaged. 
+As shown in \secref{ssec:perception_methods_noiseandoutlierdetection} the computational complexity does not depend on the threshold and rather increases linearly with frame and subwindow size.
+In this test, a subwindow size of \unit[$10\times 10$]{px} is used.
+Results are shown in \tabref{tab:sensor_experiments_resfps}.
+
+Two implementations of the algorithm are tested: The \gls{ac:cpu} measurement refers to a single-threaded implementation using an Intel i7-3930K twelve-core processor at \unit[3,2]{GHz} using one core and \unit[16]{GB} RAM. 
+The \gls{ac:gpu} version is executed on an Nvi\-dia GTX580 graphics card using 512 cores and \unit[1.5]{GB} device memory. 
+The \gls{ac:gpu} implementation for all frame sizes is about 40 times faster than the \gls{ac:cpu} implementation. 
+However, the \gls{ac:cpu} implementation is rather naive and still open for improvements. 
+For images of size \unit[$480 \times 320$]{px} real-time performance is achieved.
+
+\begin{table}[]
+  \centering
+  \begin{tabular}{ccc|cc}
+    \toprule
+    \multirow{2}{*}{Image Size}   & \multicolumn{2}{c}{EPF}   & BM3D\\
+                                  & CPU  & GPU                & CPU\\
+    $\unit{[px]}$    & $\unit{[Hz]}$    & $\unit{[Hz]}$    & $\unit{[Hz]}$\\
+    \midrule
+    $240 \times 180$  & $2.0$  & $80.4$  &\\
+    $320 \times 240$  & $1.1$  & $48.0$  &\\
+    $480 \times 320$  & $0.5$  & $23.8$  & $0.4$\\
+    $640 \times 480$  & $0.3$  & $12.4$  &\\
+    $800 \times 600$  & $0.2$  &  $7.7$  & $0.1$\\
+    $1024 \times 768$ & $0.1$  &  $4.2$  & $0.1$\\
+    \bottomrule
+  \end{tabular}
+  \caption{Time performance for images of different sizes. The test images were taken from the validation set of the Berkeley Segmentation Data Set and Benchmark~\cite{arbelaez2011contour}. 100 measurements were taken and averaged. The proposed \gls{ac:epf} filter is compared to state-of-the-art algorithm BM3D~\cite{dabov2007image} as shown in~\cite{shao2014heuristic}. BM3D is, according to~\cite{shao2014heuristic}, one of the fastest recent methods. The error is $\pm 0.1$ for all values.}
+  \label{tab:sensor_experiments_resfps}
+\end{table}
+
+
+
+
+
+\subsection{Visual Odometry in simulation}
+\label{ssec:perception_results_visualodometryinsimulation}
+
+Ground truth generation for fast flying \glspl{ac:aav} still poses a big problem.
+External tracking systems are confined to single rooms and are expensive.
+Furthermore, it is hard to distinguish, which problems arise from the visual odometry algorithm and which stem from the flight controller itself.
+
+EVO is first benchmarked on two simulations: an ``Urban Canyon'' and an ``Indoor'' scene. 
+The ``Urban Canyon'' contains a \unit[400]{m} long flight through an artificial city, while the ``Indoor'' scene is a circular path that exactly repeats thrice (details in~\cite{zhang2016benefit}). 
+Example frames from both scenes are shown in \figref{fig:robot_experiments_simulation}.
+A visual comparison of the ``Urban Canyon'' and ``Indoor'' trajectory can be found in \figref{fig:robot_experiments_simulation_2d}.
+
+\begin{figure}[]
+  \centering
+  \begin{subfigure}[]{0.475\textwidth}
+    \includegraphics[width=\textwidth]{./figures/robot/method_systemstructure_features.jpg}
+    \caption{Urban canyon scenario.}
+    \label{fig:robot_experiments_simulation_urbancanyon}
+  \end{subfigure}\hfill
+  \begin{subfigure}[]{0.475\textwidth}
+    \includegraphics[width=\textwidth]{./figures/robot/indoor_features.jpg}
+    \caption{Indoor scenario.}
+    \label{fig:robot_experiments_simulation_indoor}
+  \end{subfigure}
+  \caption{Urban canyon and indoor scenario with sparse optical flow (visualized as green dots and lines).}
+  \label{fig:robot_experiments_simulation}
+\end{figure}
+
+\begin{figure}[]
+  \centering
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/robot/experiments_urban_2d.tex}
+    \caption{Trajectory of the ``Urban Canyon'' scenario in the $x$-$y$-plane.}
+    \label{fig:robot_experiments_simulation_2d_urban}
+  \end{subfigure}
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/robot/experiments_indoor_2d.tex}
+    \caption{Trajectory of the ``Indoor'' scenario in the $x$-$y$-plane.}
+    \label{fig:robot_experiments_simulation_2d_indoor}
+  \end{subfigure}
+  \caption{Overview of the simulation results as computed by the EVO algorithm proposed here. It is compared to state-of-the-art SVO algorithm~\cite{forster2014svo}.}
+  \label{fig:robot_experiments_simulation_2d}
+\end{figure}
+
+\acrlong{ac:rmse} is used to compute the translation error as defined:
+\begin{eqnarray}
+  {\textrm{RMSE}} = \sqrt{\frac{\sum_{t=1}^n (\vec{\hat s}_t - \vec{s}_t)^2}{n}}.
+\end{eqnarray}
+\gls{ac:rmse} measures the total difference throughout the entire flight trajectory.
+Additionally, the final displacement between the ground truth finish position and the algorithm's finish position is computed.
+This is a measure for the cumulative error.
+Results can be found in \tabref{tab:experiments_simulation_rmsddisplacement}.
+A visual representation of the translation errors is shown in \figref{fig:robot_experiments_urban_translationerror} and \figref{fig:robot_experiments_indoor_translationerror}.
+
+\begin{table}[]
+  \centering
+  \begin{tabular}{l cc | cc}
+    \toprule
+            & \multicolumn{2}{c}{``Urban Canyon''} & \multicolumn{2}{c}{``Indoor''}\\
+            & \multicolumn{2}{c}{\unit[400]{m} length} & \multicolumn{2}{c}{\unit[28]{m} length}\\
+            & RMSE  & Displacement  & RMSE  & Displacement\\
+            & [m]   & [m]           & [m]   & [m]\\
+    \midrule
+    EVO     & \bm{$10.66 \pm 0.01$}   & \bm{$27.12 \pm 0.01$}   & $0.91 \pm 0.01$        & $0.14 \pm 0.01$\\
+    SVO     & $19.13 \pm 0.01$        & $60.61 \pm 0.01$	      & \bm{$0.14 \pm 0.01$}    & \bm{$0.004 \pm 0.01$}\\
+    \bottomrule
+  \end{tabular}
+  \caption{Results of the two simulation scenes ``Urban Canyon'' and ``Indoor''~\cite{zhang2016benefit}. Shown is \gls{ac:rmse}, which measures the total difference of the entire flight trajectory compared to the ground truth information. Displacement holds the euclidean distance between ground truth finish position and estimated finish position.}
+  \label{tab:experiments_simulation_rmsddisplacement}
+\end{table}
+
+\begin{figure}[]
+  \centering
+  \input{./figures/robot/experiments_urban_translationerror_x.tex}\vspace{0.25cm}\\
+  \input{./figures/robot/experiments_urban_translationerror_y.tex}\vspace{0.25cm}\\
+  \input{./figures/robot/experiments_urban_translationerror_z.tex}
+  \caption{Translation error $x$, $y$, and $z$ of the ``Urban Canyon'' trajectory shown in \figref{fig:robot_experiments_simulation_2d_urban}.}
+  \label{fig:robot_experiments_urban_translationerror}
+\end{figure}
+
+\begin{figure}[]
+  \centering
+  \input{./figures/robot/experiments_indoor_translationerror_x.tex}\vspace{0.25cm}\\
+  \input{./figures/robot/experiments_indoor_translationerror_y.tex}\vspace{0.25cm}\\
+  \input{./figures/robot/experiments_indoor_translationerror_z.tex}
+  \caption{Translation error $x$, $y$, and $z$ of the ``Indoor'' trajectory shown in \figref{fig:robot_experiments_simulation_2d_indoor}.}
+  \label{fig:robot_experiments_indoor_translationerror}
+\end{figure}
+
+The proposed method outperforms the current state-of-the-art SVO algorithm by about \unit[30]{m} in the more demanding urban canyon data set.
+On the other hand, the much smaller and more repetitive indoor scene, a circle of \unit[3]{m} diameter, which is flown for three times, can be solved better by the SVO algorithm.
+One possible reason is, that SVO does not compute the pose update on all frames.
+In SVO, a pose update is only computed on selected key frames.
+Between two key frames the pose is updated based on the latest key frame.
+In a scenario without any turns, as it is the case for a circle, this will lead to a close-to-perfect solution.
+In any real world scenario this reduced pose update is prone to failure, as can be seen in the urban canyon scenario, see \figref{fig:robot_experiments_urban_translationerror}.
+
+On the other hand, EVO contains a systematic error estimating the robots height as can be seen in \figref{fig:robot_experiments_urban_translationerror}.
+The drone continuously lifts off for the entire track.
+This might be due to the simulation environment.
+The images contained in the benchmark are simulated using a catadioptric camera as shown in \figref{fig:robot_experiments_simulation}.
+The benchmark setup is not perfectly equivalent to the system assumed in the approach and as a consequence some far-away features are estimated too low.
+
+
+
+
+
+\subsection{Externally tracked indoor flights}
+\label{ssec:perception_results_externallytrackedindoorflights}
+
+Now that EVO's performance is evaluated on a benchmark, its pose information is fused with \gls{ac:imu} data via a Kalman filter.
+First, the robot is moved manually to eliminate problems stemming from the flight control algorithm.
+These problems include rapid movements containing large feature offsets, which also poses problems for the \gls{ac:imu}, and sharing computing power with the flight controller.
+Then, the same trajectories are flown in full flight mode.
+Six scenarios are devised:
+
+\begin{enumerate}
+  \item a straight line in the $x-y$ plane with length \unit[2]{m},
+  \item a straight line upwards into the $z$-direction with length \unit[1.5]{m}, \ie lift off,
+  \item a square with side length \unit[2]{m}, the UAV always pointing into the direction of flight,
+  \item a square with side length \unit[2]{m}, the UAV always pointing into the same direction,
+  \item a circle with diameter \unit[2]{m}, the UAV always pointing into the direction of flight, and
+  \item a circle with diameter \unit[2]{m}, the UAV always pointing into the same direction.
+\end{enumerate}
+
+\begin{figure}[]
+  \centering
+  \input{./figures/robot/experiments_key_small.tex}
+  \begin{subfigure}[]{0.475\textwidth}
+    \centering
+    \input{./figures/robot/experiments_line1_small.tex}
+    \caption{Line in $x-y$ plane. The plotted scale holds for all figures.}
+    \label{fig:robot_experiments_manual_line1}
+  \end{subfigure}\hfill
+  \begin{subfigure}[]{0.475\textwidth}
+    \centering
+    \input{./figures/robot/experiments_line2_small.tex}
+    \caption{Lift off in $z$-direction plotted against the radius $r$.}
+    \label{fig:robot_experiments_manual_line2}
+  \end{subfigure}
+  \begin{subfigure}[]{0.475\textwidth}
+    \centering
+    \input{./figures/robot/experiments_square1_small.tex}
+    \caption{Square, quadrocopter pointing into direction of flight.}
+    \label{fig:robot_experiments_manual_square1}
+  \end{subfigure}\hfill
+  \begin{subfigure}[]{0.475\textwidth}
+    \centering
+    \input{./figures/robot/experiments_square2_small.tex}
+    \caption{Square, quadrocopter always pointing into the same direction.}
+    \label{fig:robot_experiments_manual_square2}
+  \end{subfigure}
+  \begin{subfigure}[]{0.475\textwidth}
+    \centering
+    \input{./figures/robot/experiments_circle1_small.tex}
+    \caption{Circle, quadrocopter pointing into direction of flight.}
+    \label{fig:robot_experiments_manual_circle1}
+  \end{subfigure}\hfill
+  \begin{subfigure}[]{0.475\textwidth}
+    \centering
+    \input{./figures/robot/experiments_circle2_small.tex}
+    \caption{Circle, quadrocopter always pointing into the same direction.}
+    \label{fig:robot_experiments_manual_circle2}
+  \end{subfigure}
+  \caption{Qualitative examples of recorded target trajectory.}
+  \label{fig:robot_experiments_manual}
+\end{figure}
+
+For each scenario ten trials were recorded, resulting in total in 120 runs.
+An example of each trajectory is shown in \figref{fig:robot_experiments_manual}.
+To achieve a meaningful evaluation, ground truth information was generated utilizing a 3d Asus Xtion Pro camera for external tracking.
+The camera only offers reasonable data in ranges smaller than \unit[3.5]{m}~\cite{haggag2013measuring}.
+Thus, only short scenarios were used.
+All results are shown in \tabref{tab:robot_experiments_rmsdresults}.
+
+\begin{table}[]
+  \centering
+  \begin{tabular}{ccc}
+    \toprule
+    Scenario & Manual mode [m] & Flight mode [m]\\
+    \midrule
+    1) &  $0.03 \pm 0.01$  & $0.07 \pm 0.03$\\
+    2) &  $0.06 \pm 0.03$  & $0.06 \pm 0.03$\\
+    3) &  $0.07 \pm 0.04$  & $0.08 \pm 0.04$\\
+    4) &  $0.05 \pm 0.02$  & $0.09 \pm 0.04$\\
+    5) &  $0.06 \pm 0.03$  & $0.11 \pm 0.05$\\
+    6) &  $0.04 \pm 0.02$  & $0.10 \pm 0.04$\\
+    \midrule
+    Average & $0.05 \pm 0.03$   & $0.09 \pm 0.04$\\
+    \bottomrule
+  \end{tabular}
+  \caption{For each of the six trajectories (which are shown in \figref{fig:robot_experiments_manual}) ten trials were performed and the averaged \gls{ac:rmse} in the x-y-plane for these trials is shown. In ``manual mode'' the quadrocopter was moved manually on the trajectories to eliminate problems from flight control algorithms. In ``flight mode'' trials were performed in full flight mode.}
+  \label{tab:robot_experiments_rmsdresults}
+\end{table}
+
+Still, this type of evaluation remains problematic.
+As shown in~\cite{haggag2013measuring, diaz2015analysis} the Asus Xtion Pro's depth resolution is \unit[$640 \times 480$]{px}.
+This already leads to a theoretical limit of \unit[14]{mm} of separation distance at a camera distance of \unit[2.5]{m}.
+However, sensor noise worsens the measurement significantly~\cite{haggag2013measuring, diaz2015analysis}.
+The errors shown in \tabref{tab:robot_experiments_rmsdresults} are accumulated based on \gls{ac:imu} and \gls{ac:vo} only.
+Ground truth is considered free of error, even though this is clearly not true.
+
+One could do a maximum error estimate of the camera recordings:
+\begin{itemize}
+  \item Voxel position in the field of view: The Asus Xtion Pro creates a pattern of structured infrared light. The reflection is recognized by an infrared sensor, which computes the voxel's depth. The pattern is much more accurate in front of the camera than on the border of the 57\degree\ field of view. Registration, the fusing of depth and RGB data, is much more accurate in the center of the pattern.
+  \item Temperature significantly increases the cameras error rate. This type of noise is uniform and does not depend on the voxel position~\cite{haggag2013measuring}.
+  \item Lastly, illumination from infrared sources, \eg the sun and many light bulbs, disrupts the structured light pattern. Voxels, which are not recognized on the pattern are extrapolated from neighboring voxels. No information is presented to the user whether the raw sensor data contains a real reading or an extrapolation to the user. Thus, quantifying an error here is almost impossible.
+\end{itemize}
+
+Heuristically, an error of up to $\unit[\pm 1]{cm}$ was found in front of the camera and an error of up to $\unit[\pm 2.5]{cm}$ was found at the edge of the horizontal field of view in an office environment.
+To solve the camera problem, one could use a predefined trajectory.
+This, however, only works for the manual mode and not for full flight mode.
+There are numerous commercial motion capturing solutions available.
+These system are either based on external tracking from multiple RGB cameras (the most prominent system is called Vicon~\cite{windolf2008systematic}), or based on sensors placed directly on the robot fusing \gls{ac:imu}, \gls{ac:vo}, and \gls{ac:gps} (\eg~\cite{tseng2009wireless}).
+However, the most prominent feature of the Asus camera is its comparatively low cost of about \unit[120]{US\$} while inexpensive commercial solutions may cost hundred times as much.
+
+
+
+
+
+\subsection{Office indoor flight}
+\label{ssec:perception_results_officeindoorflight}
+
+Next, a real world indoor office flight is shown.
+The trajectory can be found in \figref{fig:robot_experiments_indoorflight_office}.
+The flight's duration is \unit[38.4]{s}.
+The goal was to fly a figure-of-eight around a central obstacle and avoid all obstacles and walls, which resulted in the here-shown difficult trajectory.
+The real world flight adds additional challenges as errors from the flight controller are introduced.
+
+\begin{figure}[]
+  \centering
+   \input{./figures/robot/experiments_office_2d.tex}
+   \caption{The robot started and landed at position $(0,0)^T$ and flew a figure-of-eight around a central obstacle shown in gray. The trajectory (in green) shows the internal believe state of the robot (fusion of \gls{ac:vo} and \gls{ac:imu}); it is $\unit[19.4 \pm 0.1]{m}$ long. It took the robot $\unit[38.4]{s}$ to fly the track. The starting point is marked with a blue cross, the estimated landing position with a small red circle, while the real landing position was again at $(0,0)^T$.}
+  \label{fig:robot_experiments_indoorflight_office}
+\end{figure}
+
+While the robot started and landed on the same spot, the internal believe state of the robot shows a small displacement.
+Please note, that for this experiment the vision odometry, as well as other onboard sensors of the robot were used; namely a gyroscope and accelerometer.
+They are fused with the vision algorithm via an \gls{ac:ekf} as shown in \figref{fig:perception_methods_visualodometryalgorithm_flowchart}.
+Thus, one can compute the euclidean distance between the start and finish position as a measure for accuracy.
+In the $x-y-z$ plane the final displacement is $\unit[0.10 \pm 0.01]{m}$, which results in a relative error of only $0.5 \pm 0.1$\%.
+The offset in the $x-y$ plane is computed to $\unit[0.04\pm 0.01]{m}$.
+
+
+
+
+
+\subsection{Time performance of Visual Odometry algorithm}
+\label{ssec:perception_results_timeperformanceofvisualodometryalgorithm}
+
+Results for frame rates are shown in \tabref{tab:robot_experiments_framerate}.
+The novel approach presented here is compared  to the SVO~\cite{forster2014svo} algorithm.
+
+\begin{table}[]
+  \centering
+  \begin{tabular}{clcc}
+    \toprule
+    \multirow{6}{*}{\rotatebox{90}{EVO}} &    & Intel-i7 [ms] & ARM Cortex-A53 [ms]\\
+                        & Feature extraction  & $2.5 \pm 1.9$     & $14.3 \pm 3.2$\\
+                        & Optical flow        & $1.9 \pm 1.2$     & $10.6 \pm 2.2$\\
+                        & Motion computation  & $7.8 \pm 1.5$     & $33.6 \pm 7.3$\\
+                        & Depth filter update & $2.4 \pm 0.9$     & $12.4 \pm 2.8$\\
+                        & Total               & $14.6 \pm 5.5$    & $70.9 \pm 15.5$\\
+    \midrule
+    \multirow{2}{*}{\rotatebox{90}{SVO}} &    & Intel-i7 [ms]       & ARM Cortex-A9 [ms]\\
+                        & Total               & $3.04 \pm 1.10$   & $18.17 \pm 6.0$\\
+    \bottomrule
+  \end{tabular}
+  \caption{Average time consumption in milliseconds by individual components of the algorithm on the data set. Comparison between run times on a laptop (Intel Core i7 (2.80 GHz) processor and the Raspberry Pi (ARM Cortex-A53). It is compared to the SVO algorithms results as shown in~\cite{forster2014svo}.}
+  \label{tab:robot_experiments_framerate}
+\end{table}
+
+On a first glance it seems, that EVO provides a significantly worse time performance than SVO.
+Please note however, that SVO does not compute a full position update for every frame, but rather on selected key frames.
+This leads to a trade-off between fast reaction times and pose accuracy on the one hand, and computational power, which can be used for other processes, on the other hand.
+Additionally, SVO uses a more powerful processor.
+While the chosen approach --- full pose update on every frame --- is more conservative, it leads to better results in the long run.
+The question of how many frames need to be analyzed for stable results is part of ongoing research in our lab.

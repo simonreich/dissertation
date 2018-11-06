@@ -1,0 +1,193 @@
+\subsection{Action categories}
+\label{ssec:action_methods_actioncategories}
+
+In this section, we will first define the action domain.
+Here, the focus lies on actions involving hands and objects (and thus not gestures, \etc).
+Reasoning about actions seemed for a long time of purely philosophical interest and a detailed review can be found in~\cite{aune1977reason}.
+The same author states the major viewpoints~\cite{worgotter2013simple} on action ontologies as:~\cite[p. 195]{aune1988action}
+
+\begin{quote}
+``Perhaps the most controversial aspect of so called action theory is its subject matter.
+This subject matter is generally said to be (or to concern) actions, but different philosophers conceive of actions in radically different ways. 
+For some philosophers actions are abstract entities – states of affairs, propositions, sets, or even ordered pairs of some kind. 
+For others, actions are distinctively concrete entities located in space and time. 
+Another group of philosophers, among whom I include myself, have even denied that actions are required for a reasonable action theory, insisting that agents or actors will suffice as the theory's sole objects.''
+\end{quote}
+
+However, apart from the entity concept of an action, one needs to ask the question: ``What is an object?''
+Originally, this subject was perceived as bottom-up and being object-driven.
+This means different objects allow for different actions.
+This is the so-called affordance principle~\cite{shaw2017perceiving}.
+
+As stated in~\cite{worgotter2013simple} agency on the other hand suggests that the intended action lets the agent seek for appropriate objects.
+This point of view leads away from the question ``What can you do with all the things in the world'', but rather points to the question of ``What can you do with your hands?'' and recent concepts suggest that objects and actions are intertwined~\cite{turchin1993cybernetic}.
+In~\textcite{worgotter2013simple} it is shown that based on touching relations one can separate actions naturally.
+This concept is introduced in the following sections in more detail.
+
+Also stemming from this concept in~\cite{worgotter2013simple} an action ontology is derived, which assumes 26 atomic one-handed actions as shown in \tabref{tab:sec_definitionofactions_actiontable}.
+Every sequence of actions, \eg ``make a sandwich'', can be broken down into a sequence of atomic actions:
+
+\begin{table}[]
+\resizebox{\textwidth}{!}{%
+  \centering
+  \begin{tabular}{cccll}
+    \toprule
+    Nr  & Type  & Goal  & Instantiation & Example\\
+    \midrule
+    1   & 1 & r     & Punch/hit         & with your hand an object\\
+    2   & 1 & r     & Flick             & with your finger nail, quickly\\
+    3   & 1 & r     & Poke              & with your finger tip, slowly\\
+    4   & 1 & d     & Chop              & quickly, with the edge of your hand\\
+    5   & 1 & r     & Turn = bore (rotate wrist x) & a hole with your finger or your hand\\
+    6   & 1 & d     & Cut               & slowly, with the edge of your hand\\
+    7   & 1 & d/r   & Scratch           & with your finger nail\\
+    8   & 1 & d     & Scissor-cut/pinch & between your fingers\\
+    9   & 1 & d/r   & Squash, squeeze   & inside your fist\\
+    10  & 1 & d     & Draw              & with finger in sand\\
+    11  & 1 & r     & Push/pull-without-grasp & regular push, hook-pull, adduct with finger\\
+    12  & 1 & r     & Stir              & with finger\\
+    13  & 1 & r     & Knead             & kneading dough, \etc\\
+    14  & 1 & r     & Rub/massage       & with your hand someone else's body\\
+    15  & 1 & r     & Lever (rotate wrist y)    & \eg break open a hole\\
+    16  & 1 & d     & Scoop/ladle       & fill your hand with liquid\\
+    \midrule
+    17  & 2 & t     & Take Down or Pick apart   & one block from a laterally connected\\
+        &   &       &                           & group or a pile by pick \& place\\
+    18  & 2 & t     & Push down or push apart   & one block from a laterally connected\\
+        &   &       &                           & group or a pile by pushing\\
+    19  & 2 & b     & Rip off           & Rip a piece off an object\\
+    20  & 2 & b     & Break off         & Break a piece off an object\\
+    21  & 2 & b     & Uncover by pick \& place    & Pick off an object to uncover another\\
+        &   &       &                           & object\\
+    22  & 2 & b     & Uncover by pushing        & Push off an object to uncover another\\
+        &   &       &                           & object\\
+    \midrule
+    23  & 3 & c     & Put on top or Put together    & two blocks on top of each other or side\\
+        &   &       &                               & by side by pick \& place\\
+    24  & 3 & c     & Push on top or push together  & two blocks on top of each other or side\\
+        &   &       &                               & by side by pushing\\
+    25  & 3 & h     & Put over          & Put one object above another one to\\
+        &   &       &                   & cover it completely\\
+    26  & 3 & h     & Push over         & Push one object above another one to\\
+        &   &       &                   & cover it completely\\
+    \bottomrule
+  \end{tabular}
+}
+  \caption{List of atomic actions as taken from~\cite{worgotter2013simple}. 
+      More actions are listed as ``Some (sic) dynamic versions of 17 -- 26''; for example, the action ``throw-in''.
+      According to~\cite{worgotter2013simple} there are three different manipulation types (listed in the ``Type'' column): 1: Hand-only-actions; 2: Separation actions; 3: Release determined actions.
+      Abbreviations in the ``Goal'' column are defined as follows: d: destroying; r: rearranging; c: constructing; t: taking-down; h: hiding; and b: breaking.}
+  \label{tab:sec_definitionofactions_actiontable}
+\end{table}
+
+\begin{enumerate}
+  \item \action{Pick \& Place} the bread from the table on the cutting board,
+  \item \action{Cut} the bread,
+  \item \action{Scoop} marmelade,
+  \item \action{Put} marmelade \action{on top} of the bread.
+\end{enumerate}
+
+Each action is categorized into three types and each type into two goal categories:
+
+\begin{enumerate}
+  \item Hand-only actions:
+    \begin{itemize}
+      \item Rearrange (\eg hit, push, stir),
+      \item Destroy (\eg cut, draw, scoop),
+    \end{itemize}
+  \item Separation actions:
+    \begin{itemize}
+      \item Take-down (\eg take-down, push apart)
+      \item Break (\eg rip off, uncover by pick \& place),
+    \end{itemize}
+  \item Release determined actions:
+    \begin{itemize}
+      \item Construct (\eg put on top, push together),
+      \item Hide (\eg. put over, push over),
+    \end{itemize}
+\end{enumerate}
+
+where actions from each goal category share similar trajectories.
+Next, one needs to define object roles.
+These roles are determined by the changes that occur following an action in the relation of an object to other objects. 
+An action involves at least two objects: a \emph{hand} and a \emph{main} object. 
+The resulting object list (\emph{hand}, \emph{main}, \emph{primary}, \emph{secondary}, \etc) and their abstract roles are as followed (taken from~\textcite{reichaeinwoergoetter2018}):
+
+\begin{itemize}
+  \item \emph{Hand} (The object that performs the action): not touching anything at the beginning and the end of the action. It touch\-es at least one object during the manipulation.
+  \item \emph{Main} (The object which is directly in contact with the hand): not touching the hand at the beginning and the end of action. It touches the hand at least once during the manipulation.
+  \item \emph{Primary} (The object from which the \emph{main} object separates): initially touches the \emph{main} object. Changes its relation to not-touching during the action.
+  \item \emph{Secondary} (The object to which the \emph{main} object joins): initially does not touch the \emph{main} object. Changes its relation to touching during the action.
+  \item \emph{Load} (The object which is indirectly manipulated): does not touch the hand. This object touches/ untouches the \emph{main} and untouches/ touches the \emph{container} during the action .
+  \item \emph{Container} (The object whose relation with \emph{load} changes and which is not the \emph{main} object): touches or untouches the \emph{load} object.
+  \item \emph{Main support} (The object on which the \emph{main} object is located): touching the \emph{main} object at least once.
+  \item \emph{Primary support} (The object on which the \emph{primary} object is located): touching the \emph{primary} object at least once.
+  \item \emph{Secondary support} (The object on which the \emph{secondary} is located): touching the \emph{secondary} object at least once.
+  \item \emph{Tool} (The object which is used by the hand to enhance the quality of some actions): touching the hand all the time.
+\end{itemize}
+
+When looking at object roles a different categorization of actions comes to mind: One can define action categories based upon the objects, which the hand interacts with.
+These fall into three classes:
+
+\begin{enumerate}
+  \item Actions with \emph{main support}: In this category the \emph{main} object is always in touch with the \emph{main support}; an example is shown in \figref{fig:sec_definitionofactions_actionscategory_1}.
+  \item Actions without \emph{main support}: In this category the \emph{main} object is lifted from the \emph{primary} object; an example is shown in \figref{fig:sec_definitionofactions_actionscategory_2}.
+  \item Actions with \emph{load} and \emph{container}: In this category a \emph{container} with \emph{load}, \eg a glass filled with water, is used; an example is shown in \figref{fig:sec_definitionofactions_actionscategory_3}.
+\end{enumerate}
+
+A detailed list of actions is shown in \tabref{tab:sec_definitionofactions_ontologysummary}.
+While the first categorization places its focus on the high level goal of the action, the second one is derived from the bottom-up point of view of an object's structural role.
+In the following sections we will see that the structural role is also important for affordance and planning.
+
+\begin{table}[]
+  \begin{tabular}{p{3cm} p{6cm} p{3cm}}
+    \toprule
+    \multirow{2}{*}{Category}   & \multirow{2}{*}{Sub-Category} & Example\\
+                                &                               & Actions\\
+    \midrule
+    \multirow{4}{3.0cm}{\vspace{1.5cm} \textcolor{white}{~~~~~~~~~~~~~~~~~} Actions with main support} & Actions with hand, main, and main support      & push, punch, flick\\ \cmidrule(l){2-3}
+                & Actions with hand, main, main support, and primary                 & push apart, cut, chop\\ \cmidrule(l){2-3}
+                & Actions with hand, main, main support, and secondary               & push together\\ \cmidrule(l){2-3}
+                & Actions with hand, main, main support, primary, and secondary      & push from a to b\\
+    \midrule
+    \multirow{5}{3.0cm}{\vspace{1.5cm} \textcolor{white}{~~~~~~~~~~~~~~~~~} Actions without main support (These action have primary, secondary and their supports)}  & primary $\ne$ secondary and primary support $\ne$ secondary support  & pick and place, break off\\ \cmidrule(l){2-3}\
+                & primary $\ne$ secondary and primary support $=$ secondary support & pick and place, break off\\ \cmidrule(l){2-3}
+                & primary $\ne$ secondary and primary $=$ secondary support         & put on top\\ \cmidrule(l){2-3}
+                & primary $\ne$ secondary and primary support $=$ secondary         & pick apart\\ \cmidrule(l){2-3}
+                & primary $=$ secondary                                             & pick and place, break off \\
+    \midrule
+    \multirow{2}{3.0cm}{\vspace{-0.25cm} \textcolor{white}{~~~~~~~~~~~~~~~~~} Actions with load and~container} & The relation of load and main changes from N to T (loading)    & Pipetting\\ \cmidrule(l){2-3}
+                & The relation of load and main changes from T to N  (unloading)    & Pour, Drop\\
+    \bottomrule
+  \end{tabular}
+  \caption{Summary of ontology of actions. Actions are divided into three categories and further into sub-categories. There can be more than one action in each sub-category. Taken from~\textcite{reichaeinwoergoetter2018}.}
+  \label{tab:sec_definitionofactions_ontologysummary}
+\end{table}
+
+\begin{figure}[]
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sec/ontologyactions_1.tex}
+    \caption{Example action with \emph{main support}: \action{Pushing}.}
+    \label{fig:sec_definitionofactions_actionscategory_1}
+  \end{subfigure}
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sec/ontologyactions_2.tex}
+    \caption{Example action without \emph{main support}: \action{Pick and place}.}
+    \label{fig:sec_definitionofactions_actionscategory_2}
+  \end{subfigure}
+\end{figure}
+\begin{figure}[]\ContinuedFloat
+  \begin{subfigure}[]{\textwidth}
+    \centering
+    \input{./figures/sec/ontologyactions_3.tex}
+    \caption{Example action with \emph{load} and \emph{container}: \action{Unloading}. The \emph{main} object m could be, for example, a glass and the \emph{load} l could be water. The water is unloaded into a flower pot.}
+    \label{fig:sec_definitionofactions_actionscategory_3}
+  \end{subfigure}
+  \caption{Schematic example actions in the ontology are shown for the three categories.
+  From each category only one action is shown.
+  The objects are marked using the following convention:
+  h~=~hand, m~=~main m.s~=~main support, p~=~primary, p.s~=~primary support, s~=~secondary, s.s~=~secondary support, l~=~load, and cont~=~container (taken from~\textcite{reichaeinwoergoetter2018}).}
+  \label{fig:sec_definitionofactions_ontologyactions}
+\end{figure}

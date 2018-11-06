@@ -1,0 +1,100 @@
+Solved as:
+Planning Tree Branch 0  Length 8
+0 Checked: 0    Initialized by: -1      Current plan: push from x to y Object 3 to Object 1
+1 Checked: 0    Initialized by: 0       Current plan: put on top Object 6 to Object 7
+Planning Tree Branch 0  Length 8
+0 Checked: 0    Initialized by: -1      Current plan: push from x to y Object 3 to Object 1
+1 Checked: 0    Initialized by: 0       Current plan: put on top Object 6 to Object 7
+
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0][ INFO] [1439809140.229006722]: Call successfull
+Nr: 0   22 3 1 
+Nr: 1   22 6 7 
+1 6
+0 3
+Allowed Actions:
+Nr: 0   1 
+Nr: 1   1 
+Nr: 2   1 
+Nr: 3   2 
+Nr: 4   1 
+Nr: 5   1 
+Nr: 6   1 
+Nr: 7   2 
+Nr: 8   2 
+Nr: 9   2 
+Nr: 10  2 
+Nr: 11  0 
+Nr: 12  2 
+Nr: 13  2 
+Nr: 14  1 
+Nr: 15  2 
+Nr: 16  2 
+Nr: 17  2 
+Nr: 18  2 
+Nr: 19  2 
+Nr: 20  2 
+Nr: 21  2 
+Nr: 22  2 
+Nr: 23  2 
+Nr: 24  2 
+Nr: 25  2 
+Nr: 26  2 
+Nr: 27  0 
+Nr: 28  2 
+Nr: 29  2 
+
+
+------------
+
+
+Simulated SEC
+
+    0 1 2 3 4 5
+   -------------
+0 | 1 0 0 0 0 0
+1 | 0 2 0 0 1 0
+2 | 0 0 3 1 0 0
+3 | 0 0 1 4 0 0
+4 | 0 1 0 0 5 0
+5 | 0 0 0 0 0 5
+
+Solved as:
+Planning Tree Branch 0  Length 3
+0 Checked: 0    Initialized by: -1      Current plan: push from x to y Object 3 to Object 1
+Planning Tree Branch 0  Length 3
+0 Checked: 0    Initialized by: -1      Current plan: push from x to y Object 3 to Object 1
+
+  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0][ INFO] [1439809519.910055784]: Call successfull
+Nr: 0   22 3 1 
+0 3
+Allowed Actions:
+Nr: 0   1 
+Nr: 1   1 
+Nr: 2   1 
+Nr: 3   1 
+Nr: 4   1 
+Nr: 5   1 
+Nr: 6   1 
+Nr: 7   1 
+Nr: 8   1 
+Nr: 9   1 
+Nr: 10  1 
+Nr: 11  0 
+Nr: 12  1 
+Nr: 13  1 
+Nr: 14  1 
+Nr: 15  1 
+Nr: 16  1 
+Nr: 17  1 
+Nr: 18  1 
+Nr: 19  1 
+Nr: 20  1 
+Nr: 21  1 
+Nr: 22  1 
+Nr: 23  1 
+Nr: 24  1 
+Nr: 25  1 
+Nr: 26  1 
+Nr: 27  0 
+Nr: 28  1 
+Nr: 29  1 

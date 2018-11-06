@@ -1,0 +1,111 @@
+% Define block styles
+\tikzstyle{block} = [rectangle, fill=white, text centered, minimum height=0.5em, rounded corners=true]
+\tikzstyle{blockBox} = [draw, rectangle, fill=white, minimum height=3cm, minimum width=4.5cm, text width=1em, text centered, rounded corners=true]
+
+\tikzstyle{blockSupP} = [draw, rectangle, fill=red1!20,   minimum height=0.52cm, minimum width=1.3cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{blockSupM} = [draw, rectangle, fill=green1!20, minimum height=0.52cm, minimum width=4cm, text width=3.8cm, text centered, rounded corners=true]
+\tikzstyle{blockSupS} = [draw, rectangle, fill=blue1!20,  minimum height=0.52cm, minimum width=1.3cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{blockSup}  = [draw, rectangle, fill=red1!20,   minimum height=0.52cm, minimum width=3.1cm, text width=3.1cm, text centered, rounded corners=true]
+
+\tikzstyle{blockCon} = [draw, rectangle, fill=white, minimum height=0.5cm, minimum width=1cm, text width=0.6cm, text centered, rounded corners=true]
+\tikzstyle{blockP} = [draw, rectangle, fill=red1!40, minimum height=0.52cm, minimum width=0.6cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{blockM} = [draw, rectangle, fill=green1!40, minimum height=0.52cm, minimum width=1.6cm, text width=1.6cm, text centered, rounded corners=true]
+\tikzstyle{blockS} = [draw, rectangle, fill=blue1!40, minimum height=0.52cm, minimum width=0.6cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{blockL} = [draw, rectangle, fill=black!20, minimum height=0.52cm, minimum width=0.6cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{arrow} = [draw, -latex]
+\tikzstyle{line} = [draw]
+
+\definecolor{red1}{RGB}{160,0,0}
+\definecolor{green1}{RGB}{0,160,0}
+\definecolor{blue1}{RGB}{0,0,160}
+
+\pgfdeclareimage[width=0.6cm]{hand}{./figures/sec/robothand.jpg}
+
+	      
+\begin{tikzpicture}[node distance=6em, auto]
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% First line
+	\node [blockBox] (p11) {};
+	\node [blockBox, right of=p11, node distance=5cm] (p12) {};
+	\node [blockBox, right of=p12, node distance=5cm] (p13) {};
+
+	% Panel number
+	\node[below left] at (p11.north east) {1};
+	\node[below left] at (p12.north east) {2};
+	\node[below left] at (p13.north east) {3};
+
+	% Panel 11
+	\node[above right, xshift=0.25cm, blockSupM] at (p11.south west) (p11_Sup) {\small{main support (id=0)}};
+	\node[above of=p11_Sup, blockM, node distance=0.67cm, xshift=-0.6cm] (p11_m) {\small{m (id=1)}};
+	\node[left of=p11_m, node distance=0.7cm, yshift=1.0cm] (p11_h) {\pgfuseimage{hand}};
+
+	% Panel 12
+	\node[above right, xshift=0.25cm, blockSupM] at (p12.south west) (p12_Sup) {\small{main support (id=0)}};
+	\node[above of=p12_Sup, blockM, node distance=0.67cm, xshift=-0.6cm] (p12_m) {\small{m (id=1)}};
+	\node[left of=p12_m, node distance=1.2cm, yshift=0.3cm] (p12_h) {\pgfuseimage{hand}};
+
+	\node[above of=p12_Sup, blockM, node distance=0.67cm, xshift=-0.6cm] (p12_m) {\small{m (id=1)}};
+
+	% Panel 13
+	\node[above right, xshift=0.25cm, blockSupM] at (p13.south west) (p13_Sup) {\small{main support (id=0)}};
+	\node[above of=p13_Sup, blockM, node distance=0.67cm, xshift=0.9cm] (p13_m) {\small{m (id=1)}};
+	\node[left of=p13_m, node distance=1.5cm, yshift=0.9cm] (p13_h) {\pgfuseimage{hand}};
+
+  % Trajectory
+  %\draw[dashed, line width=0.25mm] ([xshift=-1.4cm, yshift=1.3cm]p11_Sup.north) to[rounded corners=20pt] ([xshift=-2.1cm, yshift=0.5cm]p11_Sup.north) to[rounded corners=20pt] ([xshift=0.0cm, yshift=0.5cm]p11_Sup.north) to[rounded corners=20pt] ([xshift=-0.6cm, yshift=1.2cm]p11_Sup.north);
+
+  \draw[dashed, line width=0.25mm] ([xshift=-1.4cm, yshift=1.3cm]p12_Sup.north) to[rounded corners=20pt] ([xshift=-1.8cm, yshift=0.7cm]p12_Sup.north);
+
+  \draw[dashed, line width=0.25mm] ([xshift=-1.4cm, yshift=1.3cm]p13_Sup.north) to[rounded corners=20pt] ([xshift=-2.1cm, yshift=0.5cm]p13_Sup.north) to[rounded corners=20pt] ([xshift=0.0cm, yshift=0.5cm]p13_Sup.north) to[rounded corners=20pt] ([xshift=-0.6cm, yshift=1.2cm]p13_Sup.north);
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Second line
+
+  \node[block, below of=p11,    node distance=4.5cm] (p21_ms) {main support, id=0};
+  \node[block, above of=p21_ms, node distance=1cm] (p21_m) {main, id=1};
+  \node[block, above of=p21_ms, node distance=2cm] (p21_hand) {robot hand, id=2};
+  \draw[line] (p21_ms.north) to (p21_m.south);
+
+  \node[block, below of=p12,    node distance=4.5cm] (p22_ms) {main support, id=0};
+  \node[block, above of=p22_ms, node distance=1cm] (p22_m) {main, id=1};
+  \node[block, above of=p22_ms, node distance=2cm] (p22_hand) {robot hand, id=2};
+  \draw[line] (p22_ms.north) to (p22_m.south);
+  \draw[line] (p22_m.north) to (p22_hand.south);
+
+  \node[block, below of=p13,    node distance=4.5cm] (p23_ms) {main support, id=0};
+  \node[block, above of=p23_ms, node distance=1cm] (p23_m) {main, id=1};
+  \node[block, above of=p23_ms, node distance=2cm] (p23_hand) {robot hand, id=2};
+  \draw[line] (p23_ms.north) to (p23_m.south);
+
+
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% Third line
+
+    \node[block, below of=p21_ms, node distance=2.25cm] (p31) {
+      $\bordermatrix{
+        & 0 & 1 & 2\cr
+        0 & \colorbox{green120}{0}  & \textup{T}              & \textup{N}\cr
+        1 & \textup{T}              & \colorbox{green120}{1}  & \textup{N}\cr
+        2 & \textup{N}              & \textup{N}              & \colorbox{green120}{2}\cr        
+      }$
+    };
+
+    \node[block, below of=p22_ms, node distance=2.25cm] (p31) {
+      $\bordermatrix{
+        & 0 & 1 & 2\cr
+        0 & \colorbox{green120}{0}  & \textup{T}              & \textup{N}\cr
+        1 & \textup{T}              & \colorbox{green120}{1}  & \textup{T}\cr
+        2 & \textup{N}              & \textup{T}              & \colorbox{green120}{2}\cr        
+      }$
+    };
+
+    \node[block, below of=p23_ms, node distance=2.25cm] (p31) {
+      $\bordermatrix{
+        & 0 & 1 & 2\cr
+        0 & \colorbox{green120}{0}  & \textup{T}              & \textup{N}\cr
+        1 & \textup{T}              & \colorbox{green120}{1}  & \textup{N}\cr
+        2 & \textup{N}              & \textup{N}              & \colorbox{green120}{2}\cr        
+      }$
+    };
+\end{tikzpicture}

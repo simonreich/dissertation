@@ -1,0 +1,28 @@
+% Define block styles
+\tikzstyle{block} = [rectangle, fill=white, text centered, minimum height=0.5em, rounded corners=false]
+\tikzstyle{arrow} = [draw, -latex]
+\tikzstyle{background} = [draw, rectangle, text centered, text width=3.5cm, minimum height=4.7cm, color=white]
+
+\usetikzlibrary{decorations.pathreplacing}
+
+\definecolor{red1}{RGB}{160,0,0}
+\definecolor{green1}{RGB}{0,160,0}
+\definecolor{blue1}{RGB}{0,0,160}
+
+	      
+\begin{tikzpicture}[node distance=3em, auto]
+	% Example
+	\node [block] (S01) {Table};
+	\node [block, above of=S01] (M01) {\textcolor{red1}{Plate}};
+	\node [block, left of=M01, node distance=5em]  (O01) {Bottle};
+	\node [block, right of=M01, node distance=5em] (O02) {Knife};
+	\node [block, above of=M01] (O03) {Apple};
+
+	\draw [] (S01.north) to (M01.south);
+	\draw [] (S01.north west) to (O01.south east);
+	\draw [] (S01.north east) to (O02.south west);
+	\draw [] (M01.north) to (O03.south);
+	\draw [] (M01.east) to (O02.west);
+
+  \node[background] at (M01) {};
+\end{tikzpicture}

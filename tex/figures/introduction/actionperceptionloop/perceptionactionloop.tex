@@ -1,0 +1,50 @@
+% Define block styles
+\tikzstyle{block} = [draw, rectangle, fill=white, minimum height=3cm, minimum width=3.0cm, text width=2.9cm, text centered, rounded corners=true]
+\tikzstyle{blockScene} = [draw, rectangle, fill=white, minimum height=3cm, minimum width=6.0cm, text width=5.9cm, text centered, rounded corners=true]
+\tikzstyle{blockFit} = [draw, inner sep=0.2cm, dashed, rectangle, minimum width=3.0cm, text centered, rounded corners=true]
+\tikzstyle{blockText} = [text centered, minimum height=1cm]
+\tikzstyle{arrow} = [draw, -latex]
+
+\definecolor{red1}{RGB}{160,0,0}
+\definecolor{green1}{RGB}{0,160,0}
+\definecolor{blue1}{RGB}{0,0,160}
+
+% Define images
+\pgfdeclareimage[height=2.5cm]{scene}{./figures/introduction/actionperceptionloop/scene.jpg}
+	      
+\begin{tikzpicture}[node distance = 8cm, auto]
+  % Scene
+  \node[blockScene] (scene_h) {\pgfuseimage{scene}};
+
+	% Human
+  \node [block, right of=scene_h, node distance=6cm] (eye_h) {\textbf{Human:}\\Vision, smell, taste, touch, \ldots};
+  \node [block, below of=eye_h, node distance=5cm] (brain_h) {\textbf{Human:}\\Brain};
+  \node [block, left of=brain_h, node distance=7.6cm]  (arm_h) {\textbf{Human:}\\Arms, legs, \ldots};
+
+  % Robot
+  \node [block, right of=eye_h, node distance=3.2cm] (eye_r) {\textbf{Robot:}\\Camera, gyroscope, accelerometer, \ldots};
+  \node [block, right of=brain_h, node distance=3.2cm] (brain_r) {\textbf{Robot:}\\Computer Vision, planning, \ldots};
+  \node [block, right of=arm_h, node distance=3.2cm] (arm_r) {\textbf{Robot:}\\Motors, wheels};
+
+  % Text
+  \node [blockText, above of=scene_h, color=red1, yshift=-6.06cm] (scene_t) {Scene};
+  \node [blockText, above right of=eye_h, color=blue1, xshift=-4.0cm, yshift=-3.7cm] (eye_t) {Sensors};
+  \node [blockText, above right of=brain_h, color=blue1, xshift=-4.0cm, yshift=-3.7cm] (brain_t) {Cognition};
+  \node [blockText, above right of=arm_h, color=red1, xshift=-4.0cm, yshift=-3.7cm] (arm_t) {Actuators};
+
+  % Fit
+  \node[fit=(scene_h)(scene_t), blockFit] (scene) {};
+  \node[fit=(eye_h)(eye_r)(eye_t), blockFit] (eye) {};
+  \node[fit=(brain_h)(brain_r)(brain_t), blockFit] (brain) {};
+  \node[fit=(arm_h)(arm_r)(arm_t), blockFit] (arm) {};
+
+  % Arrows
+	\path [arrow] (scene.east) to (eye.west);
+	\path [arrow] (eye.south) to (brain.north);
+	\path [arrow] (brain.west) to (arm.east);
+	\path [arrow] (arm.north) to (scene.south);
+
+  % Action-Perception side
+  \node [blockText, below of=arm_t, color=red1, node distance=5cm] (action_t) {{\Huge Action side}};
+  \node [blockText, below of=brain_t, color=blue1, node distance=5cm] (action_t) {{\Huge Perception side}};
+\end{tikzpicture}

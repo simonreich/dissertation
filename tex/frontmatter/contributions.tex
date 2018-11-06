@@ -1,0 +1,75 @@
+I supervised numerous Bachelor and Master students, who contributed work to \charef{cha:perception}.
+
+\paragraph{Georg Jahn} finished two Master's Theses in our lab, one for computer science and one for physics, in 2014.
+He assembled the FlyPi robot, included a Kalman- and PID-Controller, and added a front-facing camera to the quadcopter.
+He invented a marker system used for navigation, which is more error robust than most current systems and can be read by a fast moving robot.
+The quadcopter navigates using the marker system.
+Student work: 80\%, Supervisor work: 20\%.
+The supervisor contributed as: theses supervision, project guidance, and detailed knowledge about data filtering, and hardware design.
+
+\paragraph{Daniel Kalin} wrote a Bachelor's Thesis in computer science in 2015.
+He assembled the first WheelPi robot and adapted the FlyPi robot-specific code to a slow-moving ground based robot.
+Additionally, he added a SLAM algorithm based on an ultrasonic sonar.
+Student work: 85\%, Supervisor work: 15\%.
+The supervisor contributed as: thesis supervision, project guidance, code review, detailed knowledge about electronic circuits, detailed knowledge about data filtering, and detailed knowledge about SLAM on embedded hardware with limited memory.
+
+\paragraph{Martin Heinemann} finished his Bachelor's Thesis in computer science in 2016.
+He assembled the second WheelPi robot and enhanced some of the wiring, \eg removed an Arduino Board and moved its workload onto the Raspberry Pi computer.
+Additionally, he worked on a stitching algorithm, which combines two overlapping images into one large image.
+This algorithm is used to fuse multiple maps into one.
+Both WheelPi robots now can record maps and share knowledge of obstacles.
+Student work: 80\%, Supervisor work: 20\%.
+The supervisor contributed as: thesis supervision, project guidance, code review, detailed knowledge about electronic circuits, and computer vision methods on embedded hardware with limited computational power.
+
+\paragraph{Caroline Campbell} wrote her Bachelor's Thesis in physics in 2016.
+The goal of her work was to learn the three static parameters of a PID control system using a shallow neural net.
+Furthermore, she introduced a simulation environment for the FlyPi robot.
+Student work: 90\%, Supervisor work: 10\%.
+The supervisor contributed as: thesis supervision, project guidance, and detailed knowledge about learning algorithms.
+
+\paragraph{Jan Lukas Bosse and Johannes Otto} worked in the lab during an internship over the course of one semester.
+First, they measured the performance of the robot's \gls{ac:imu}.
+Second, this data was used to estimate the robot's position via a Kalman Filter.
+Student work: 80\%, Supervisor work: 20\%.
+The supervisor contributed as: supervisor, project guidance, detailed knowledge about electronic circuits, and Kalman Filter design.
+
+\paragraph{Lars Berscheid} worked on a Master's Thesis in physics in 2016.
+He introduced an omnidirectional camera setup, computed features on the image stream, and from those he calculated the optical flow.
+This is used to infer the robots offset from one frame to the next and is called \gls{ac:vo}.
+Student work: 90\%, Supervisor work: 10\%.
+The supervisor contributed as: thesis supervision, project guidance, detailed knowledge about electronic circuits, and computer vision methods on embedded hardware with limited computational power.
+
+\paragraph{Damian Bast} worked on a Bachelor's Thesis in computer science in 2017.
+In his thesis he built an algorithm that learns relationships between the robot's actuators and its sensors.
+Thus, a forward-model of the robot is generated.
+Student work: 90\%, Supervisor work: 10\%.
+The supervisor contributed as: thesis supervision, project guidance, and detailed knowledge about learning algorithms.
+
+\paragraph{Maurice Seer} finished his Master's Thesis in physics in 2018.
+He added a laser pointer to the quadcopter, which is able to point at a specific point in space while the robot is flying.
+Moreover, he significantly refined the \gls{ac:vo} algorithm and introduced a benchmark, which allows comparison to other methods.
+He estimates the depth of the features, which are used to compute the optical flow.
+Additionally, he and Lars Berscheid integrated the existing system into \gls{ac:ros}.
+This allowed for a modular design structure.
+Student work: 85\%, Supervisor work: 15\%.
+The supervisor contributed as: thesis supervision, project guidance, detailed knowledge about electronic circuits, detailed knowledge about \gls{ac:ros} nodes, and computer vision methods on embedded hardware with limited computational power.
+
+\paragraph{Philipp D\"onges} worked on his Master's Thesis in physics in 2018.
+He added the \gls{ac:vo} setup and a motor odometer to the WheelPi robots.
+This allowed to benchmark the \gls{ac:vo} algorithm not only in simulation, but also in a real world experiment.
+Additionally, he significantly improved the feature's depth estimate.
+Student work: 85\%, Supervisor work: 15\%.
+The supervisor contributed as: thesis supervision, project guidance, detailed knowledge about electronic circuits, detailed knowledge about \gls{ac:ros} nodes, and computer vision methods on embedded hardware with limited computational power.
+
+\paragraph{Erik Schultheis} worked on his Master's Thesis in physics in 2018.
+Similarly to Caroline Campbell, in his thesis he learned the three static parameters of the PID controller using a shallow neural net.
+He realized that this learning method is too limited as it does not take long term effects into account.
+Therefore, it was extended to an actor-critic system with deep deterministic policy gradient.
+He showed that in this system the policy-net can be replaced by a much simpler system, \ie a PID controller, which in turn converges significantly faster.
+Student work: 90\%, Supervisor work: 10\%.
+The supervisor contributed as: thesis supervision, project guidance, and detailed knowledge about machine learning.
+
+\paragraph{Kevin Vorwerk} wrote his Bachelor's Thesis in computer science in 2018.
+In his work he implemented a SLAM algorithm based on the \gls{ac:vo} setup.
+Student work: 85\%, Supervisor work: 15\%.
+The supervisor contributed as: thesis supervision, project guidance, detailed knowledge about SLAM algorithms, and detailed knowledge about computer vision methods on embedded hardware with limited computational power.

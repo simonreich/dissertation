@@ -1,0 +1,135 @@
+% Define block styles
+\tikzstyle{block} = [rectangle, fill=white, text width=1em, text centered, minimum height=0.5em, rounded corners=true]
+\tikzstyle{blockBox} = [draw, rectangle, fill=white, minimum height=3cm, minimum width=5.5cm, text width=1em, text centered, rounded corners=true]
+
+\tikzstyle{blockSupP} = [draw, rectangle, fill=red1!20, minimum height=0.6cm, minimum width=1.3cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{blockSupM} = [draw, rectangle, fill=green1!20, minimum height=0.6cm, minimum width=1.3cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{blockSupS} = [draw, rectangle, fill=blue1!20, minimum height=0.6cm, minimum width=1.3cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{blockSup} = [draw, rectangle, fill=red1!20, minimum height=0.6cm, minimum width=3.5cm, text width=3.5cm, text centered, rounded corners=true]
+
+\tikzstyle{blockCon} = [draw, rectangle, fill=white, minimum height=0.6cm, minimum width=1.3cm, text width=1.2cm, text centered, rounded corners=true]
+\tikzstyle{blockP} = [draw, rectangle, fill=red1!40, minimum height=0.6cm, minimum width=0.6cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{blockM} = [draw, rectangle, fill=green1!40, minimum height=0.6cm, minimum width=0.6cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{blockS} = [draw, rectangle, fill=blue1!40, minimum height=0.6cm, minimum width=0.6cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{blockL} = [draw, rectangle, fill=black!20, minimum height=0.6cm, minimum width=0.6cm, text width=1em, text centered, rounded corners=true]
+\tikzstyle{arrow} = [draw, -latex]
+
+\definecolor{red1}{RGB}{160,0,0}
+\definecolor{green1}{RGB}{0,160,0}
+\definecolor{blue1}{RGB}{0,0,160}
+
+\pgfdeclareimage[width=0.6cm]{hand}{./figures/sec/robothand.jpg}
+
+	      
+\begin{tikzpicture}[node distance=6em, auto]
+	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+	% third line
+	\node [blockBox] (p31) {};
+	\node [blockBox, right of=p31, node distance=6cm] (p32) {};
+	\node [blockBox, below of=p31, node distance=3.5cm] (p33) {};
+	\node [blockBox, right of=p33, node distance=6cm] (p34) {};
+	\node [blockBox, below of=p33, node distance=3.5cm] (p35) {};
+
+	\node [blockBox, right of=p35, node distance=6cm] (p36) {};
+	\node [blockBox, below of=p35, node distance=3.5cm] (p37) {};
+
+	% panel number
+	\node[below left] at (p31.north east) {1};
+	\node[below left] at (p32.north east) {2};
+	\node[below left] at (p33.north east) {3};
+	\node[below left] at (p34.north east) {4};
+	\node[below left] at (p35.north east) {5};
+	\node[below left] at (p36.north east) {6};
+	\node[below left] at (p37.north east) {7};
+
+	% Panel 31
+	\node [above right, xshift=0.4cm, blockSupP] at (p31.south west) (p31_ps) {\small{p.s}};
+	\node [right of=p31_ps, blockSupS, node distance=1.7cm] (p31_ss) {\small{s.s}};
+	\node [right of=p31_ss, blockCon, node distance=1.7cm] (p31_con) {\small{cont}};
+
+	\node [above of=p31_ps, blockP, node distance=0.6cm] (p31_p) {\small{p}};
+	\node [above of=p31_p, blockM, node distance=0.6cm] (p31_m) {\small{m}};
+	\node [above of=p31_m, blockL, node distance=0.6cm] (p31_l) {\small{l}};
+	\node [above of=p31_ss, blockS, node distance=0.6cm] (p31_s) {\small{s}};
+
+	\node [above of=p31_m, node distance = 0.15cm, xshift=2.5cm] (p31_h) {\pgfuseimage{hand}};
+
+	% Panel 32
+	\node [above right, xshift=0.4cm, blockSupP] at (p32.south west) (p32_ps) {\small{p.s}};
+	\node [right of=p32_ps, blockSupS, node distance=1.7cm] (p32_ss) {\small{s.s}};
+	\node [right of=p32_ss, blockCon, node distance=1.7cm] (p32_con) {\small{cont}};
+
+	\node [above of=p32_ps, blockP, node distance=0.6cm] (p32_p) {\small{p}};
+	\node [above of=p32_p, blockM, node distance=0.6cm] (p32_m) {\small{m}};
+	\node [above of=p32_m, blockL, node distance=0.6cm] (p32_l) {\small{l}};
+	\node [above of=p32_ss, blockS, node distance=0.6cm] (p32_s) {\small{s}};
+
+	\node [above of=p32_m, node distance = 0.2cm, xshift=-0.5cm] (p32_h) {\pgfuseimage{hand}};
+	\node [above of=p32_p, blockM, node distance=0.6cm] (p32_m) {\small{m}};
+	\node [above of=p32_m, blockL, node distance=0.6cm] (p32_l) {\small{l}};
+
+	% Panel 33
+	\node [above right, xshift=0.4cm, blockSupP] at (p33.south west) (p33_ps) {\small{p.s}};
+	\node [right of=p33_ps, blockSupS, node distance=1.7cm] (p33_ss) {\small{s.s}};
+	\node [right of=p33_ss, blockCon, node distance=1.7cm] (p33_con) {\small{cont}};
+
+	\node [above of=p33_ps, blockP, node distance=0.6cm] (p33_p) {\small{p}};
+	\node [above of=p33_p, blockM, node distance=0.8cm, xshift=1cm] (p33_m) {\small{m}};
+	\node [above of=p33_m, blockL, node distance=0.6cm] (p33_l) {\small{l}};
+	\node [above of=p33_ss, blockS, node distance=0.6cm] (p33_s) {\small{s}};
+
+	\node [above of=p33_m, node distance = 0.2cm, xshift=-0.5cm] (p33_h) {\pgfuseimage{hand}};
+	\node [above of=p33_p, blockM, node distance=0.8cm, xshift=1cm] (p33_m) {\small{m}};
+	\node [above of=p33_m, blockL, node distance=0.6cm] (p33_l) {\small{l}};
+
+	% Panel 34
+	\node [above right, xshift=0.4cm, blockSupP] at (p34.south west) (p34_ps) {\small{p.s}};
+	\node [right of=p34_ps, blockSupS, node distance=1.7cm] (p34_ss) {\small{s.s}};
+	\node [right of=p34_ss, blockCon, node distance=1.7cm] (p34_con) {\small{cont}};
+
+	\node [above of=p34_ps, blockP, node distance=0.6cm] (p34_p) {\small{p}};
+	\node [above of=p34_con, blockL, node distance=0.6cm] (p34_l) {\small{l}};
+	\node [above of=p34_l, blockM, node distance=0.6cm, xshift=-0.2cm] (p34_m) {\small{m}};
+	\node [above of=p34_ss, blockS, node distance=0.6cm] (p34_s) {\small{s}};
+
+	\node [above of=p34_m, node distance=0.4cm, xshift=-0.5cm] (p34_h) {\pgfuseimage{hand}};
+	\node [above of=p34_l, blockM, node distance=0.6cm, xshift=-0.2cm] (p34_m) {\small{m}};
+
+	% Panel 35
+	\node [above right, xshift=0.4cm, blockSupP] at (p35.south west) (p35_ps) {\small{p.s}};
+	\node [right of=p35_ps, blockSupS, node distance=1.7cm] (p35_ss) {\small{s.s}};
+	\node [right of=p35_ss, blockCon, node distance=1.7cm] (p35_con) {\small{cont}};
+
+	\node [above of=p35_ps, blockP, node distance=0.6cm] (p35_p) {\small{p}};
+	\node [above of=p35_con, blockL, node distance=0.6cm] (p35_l) {\small{l}};
+	\node [above of=p35_l, blockM, node distance=0.9cm, xshift=-0.6cm] (p35_m) {\small{m}};
+	\node [above of=p35_ss, blockS, node distance=0.6cm] (p35_s) {\small{s}};
+
+	\node [above of=p35_m, node distance = 0.4cm, xshift=-0.5cm] (p35_h) {\pgfuseimage{hand}};
+	\node [above of=p35_l, blockM, node distance=0.9cm, xshift=-0.6cm] (p35_m) {\small{m}};
+
+	% Panel 36
+	\node [above right, xshift=0.4cm, blockSupP] at (p36.south west) (p36_ps) {\small{p.s}};
+	\node [right of=p36_ps, blockSupS, node distance=1.7cm] (p36_ss) {\small{s.s}};
+	\node [right of=p36_ss, blockCon, node distance=1.7cm] (p36_con) {\small{cont}};
+
+	\node [above of=p36_ps, blockP, node distance=0.6cm] (p36_p) {\small{p}};
+	\node [above of=p36_con, blockL, node distance=0.6cm] (p36_l) {\small{l}};
+	\node [above of=p36_ss, blockS, node distance=0.6cm] (p36_s) {\small{s}};
+	\node [above of=p36_s, blockM, node distance=0.6cm] (p36_m) {\small{m}};
+
+	\node [above of=p36_m, node distance = 0.4cm, xshift=-0.5cm] (p36_h) {\pgfuseimage{hand}};
+	\node [above of=p36_s, blockM, node distance=0.6cm] (p36_m) {\small{m}};
+
+	% Panel 37
+	\node [above right, xshift=0.4cm, blockSupP] at (p37.south west) (p37_ps) {\small{p.s}};
+	\node [right of=p37_ps, blockSupS, node distance=1.7cm] (p37_ss) {\small{s.s}};
+	\node [right of=p37_ss, blockCon, node distance=1.7cm] (p37_con) {\small{cont}};
+
+	\node [above of=p37_ps, blockP, node distance=0.6cm] (p37_p) {\small{p}};
+	\node [above of=p37_con, blockL, node distance=0.6cm] (p37_l) {\small{l}};
+	\node [above of=p37_ss, blockS, node distance=0.6cm] (p37_s) {\small{s}};
+	\node [above of=p37_s, blockM, node distance=0.6cm] (p37_m) {\small{m}};
+
+	\node [above of=p37_m, node distance = 0.9cm, xshift=-1cm] (p37_h) {\pgfuseimage{hand}};
+\end{tikzpicture}

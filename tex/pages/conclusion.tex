@@ -1,0 +1,78 @@
+\label{sec:conclusion_conclusion}
+
+In this work, two robot systems are analyzed in detail.
+Both perform as closed-loop systems in the robotic action-perception loop.
+The first system consists of three robots: two wheeled and one flying agent, which all three share the same hardware base.
+Here, the focus lies on the perception side of the loop.
+The second system assesses the question of low level planning and action domain.
+The action side of the loop is discussed in great detail in this part.
+
+
+For the first system a low level denoising algorithm is introduced, which is able to filter RGB images but also generalizes on any dimension.
+Because of this property the filter is used on 1d data on the robots.
+It is shown that it outperforms other local methods in quality.
+Global methods produce better results, but are computational to expensive to run on embedded hardware.
+In a second part of this chapter, the perception side is analyzed in further detail.
+The robots are equipped with omnidirectional cameras, which allow for stable feature detection even when the robot changes poses rapidly.
+On simulation it is shown that the developed algorithms outperform current state-of-the-art.
+The results from this chapter enable truly autonomous flying robots in indoor, \gls{ac:gps}-denied environments.
+This includes, but is not limited to, indoor building inspections after, for example, earthquakes, underground search-and-rescue in mining disasters, and systems, which need to have a fall-back setting if the \gls{ac:gps} system fails.
+
+
+Some questions still remain open and should be studied further.
+First, the quality of the filter on 2d can still be enhanced greatly.
+In all methods, a noisy pixel is detected based on some threshold.
+Global methods, currently most prominently deep learning algorithms, search for similar patches in the entire image and try to replace the noisy area.
+This is, however, computationally very expensive.
+Local methods replace noisy pixels based on a predefined local neighborhood.
+One could extend the here presented sliding window approach to search for similar patches around a noisy pixel in a local neighborhood.
+This combines the quality deep learning methods bring along with the speed of local methods.
+
+There are many follow-up ideas for the quadcopter project, too:
+
+\begin{itemize}
+  \item Evaluation of long term flights via tracking the robot's position with external cameras. For example, high precision Vicon cameras offer sub millimeter accuracy at $\unit[120]{Hz}$~\cite{windolf2008systematic}.
+  \item Currently, at each frame a full pose update is computed. This is, however, computationally expensive. One could, based on the last pose updates and based upon the assumption that on small time scales not too much changes, compute a new pose via \gls{ac:vo} only, if the \gls{ac:imu} indicates a large change.
+  \item This method is fully data driven. This bottom-up method has proven to be useful in an unknown and possibly unstructured environment, \eg inside a house after an earthquake. However, one could use some high level features, \eg ``door frame might be an opening to adjacent room'' for navigation.
+  \item As currently a map is built, there is no loop closure detection. This would lead to a full Simultaneous Localization and Mapping approach.
+  \item Last, one should devise more benchmarks for evaluation against other methods. However, creating a fully simulated environment is very tedious.
+\end{itemize}
+
+
+Second, the \gls{ac:vo}'s depth acquisition algorithm needs to be analyzed in more detail.
+This means, the computed depth of points needs to be compared to ground truth information, preferable in a real-world measurement and not in simulation.
+One feature's error depends on multiple settings: most prominently the camera's resolution, how stable the feature can be tracked, and it depends heavily on the error of all other found features (as the pose update is computed from all features).
+How to find a good error measure is currently ongoing research.
+An understanding of the error margins can be used to track each feature using an \gls{ac:ekf}.
+Permanent tracking allows for non-static features.
+Furthermore, if the robot returns to a previously visited place, it could redetect the features and perform loop closure detection.
+In \gls{ac:vo} the error accumulates over time and loop closure would raise performance significantly.
+
+
+The second system consists of a two-armed robot.
+The perception side, which is not analyzed in more detail here, of this loop generates abstract graph relations of the current scene called \gls{ac:sec}.
+Each node in this graph holds one object, an edge is added if two objects touch.
+This graph is enriched with pose relations between objects, which is computed using a 3d geometric reasoning algorithm.
+An ontology of actions shown in~\cite{worgotter2013simple} is used where each action is connected to a set of pre- and postconditions, which are also defined on the \gls{ac:sec} domain.
+It is first shown that one can compute a scene's action affordance based on the preconditions.
+Next, it is shown that the postconditions allow for simulation of an action in the \gls{ac:sec} domain.
+This enables complex planning, which is entirely data-driven and bottom up: Meaning unknown or unstructured environments do not pose a problem and the signal-to-symbol can be bridged in a natural occurring way.
+However, it is also shown that for some actions high level knowledge is required, \eg the action \action{cutting a tomato with a knife} should not happen directly on a table --- but instead on a cutting board.
+To circumvent this problem, a high level planning architecture is included, which parses human input based on predefined symbols and preconditions.
+
+
+Here, too, a few open research questions remain.
+First, can a robot learn the set of postconditions?
+Based on \acrlong{ac:sec} this means to reliably predict the changes that occur in subgraphs while performing an action.
+If so, the next question that arises is to also learn the preconditions of an action.
+The robot needs to decide when an action can be performed free of error.
+However, both of these ongoing research questions implicitly expect a previously known repository of actions.
+
+
+In a very last step one could devise an experiment, in which a robot has neither knowledge about pre- and postconditions, but also only very limited knowledge about actions.
+Only random movements towards objects and grasping are known.
+As input to the learning algorithm  \gls{ac:esec} only are given.
+Given the time, the robot would soon find out about the effect of, for example, \action{pick \& place}, \action{pushing}, and letting objects \action{drop}.
+The average time to explore an action could be used as a measure for difficulty or complexity.
+One would expect that actions that perform structural changes can be learned faster than others, for example, scratch or draw.
+This could hint at the fact that some actions are learned by trial-and-error during undirected play, while others are found by imitation.
