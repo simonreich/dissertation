@@ -2,9 +2,9 @@
 
 This repository holds the latest pdf version of my dissertation. The version [dissertation_print.pdf](dissertation_print.pdf) does not use any colored text. [dissertation_web.pdf](dissertation_web.pdf) on the other hand colors all hyperlinks (and thus has a lot more colored pages).
 
-# Tex code
+# Latex code
 
-Tex code will be uploaded after publishing.
+Latex code can be found in the folder `tex`. The Latex template is uploaded to the repository [https://github.com/simonreich/dissertation-template](https://github.com/simonreich/dissertation-template).
 
 # License
 
